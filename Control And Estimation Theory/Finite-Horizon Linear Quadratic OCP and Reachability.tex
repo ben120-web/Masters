@@ -1,0 +1,337 @@
+\documentclass{article}
+\usepackage{amsmath}
+
+\begin{document}
+
+CAT I Problems
+
+1.1
+
+The optimization problem is given by:
+\begin{align*}
+& \text{Minimize:} \quad J(u_N, x_N) = \sum_{t=0}^{N-1} \left(\frac{1}{2} x_t^T Q x_t + \frac{1}{2} u_t^T R u_t\right) + \frac{1}{2} x_N^T P_f x_N \\
+& \text{Subject to:} \quad x_{t+1} = A x_t + B u_t + c, \quad \forall t \in \{0, 1, \ldots, N-1\} \\
+& \quad x_0 = x \\
+& \text{Notation:} \quad u = (u_0, u_1, \ldots, u_{N-1}), \quad x = (x_0, x_1, \ldots, x_N)
+\end{align*}
+
+
+We need to determine the 1) Optimal Control Sequence, 2) Optimal sequence of states and 3) Optimal value of the problem.
+
+Now, given : 
+
+\[ x_0 = x\]
+
+We have:
+
+\[x_1 = Ax + Bu_0 + c\]
+
+\[x_2 = { A}{x_1} + {B}{u_1} + c = A^2x + ABu_0 + Bu_1 + c\]
+
+\[x_3 = A^3x + A^2Bu_0 + ABu_1 + c\]
+.
+..
+...
+
+\[x_t = A^t x + A^t-1Bu_0 + ... Bu_{t-1} + c\]
+
+
+Where 
+
+\[ x = \bar{A} x + \bar{B}{U_N}\]
+
+By defining :
+
+\[ \bar{Q} = blkdiag(Q_1, Q_2, Q_3, ... Q_{N-1}, P_f) \] 
+
+\[ \bar{R} = blkdiag(R_1, R_2, R_3, ... R_{N-1}) \] 
+
+And omitting the constant:
+
+\[ \frac{1}{2} x_0^T Q x_0\]
+
+From the cost, we can write P as:
+
+\[ {Minimize:} \quad J(u_N, x_N) = \frac{1}{2} x_N^T \bar{Q} x_N + \frac{1}{2} u_N^T \bar{R} u_N \]
+
+\[ s.t : x_{t+1} = A x_t + B u_t + c, \quad \forall t \in \{0, 1, \ldots, N-1\} \] 
+\[ x_0 = x \] 
+\[ u_N = (u_0, u_1, \ldots, u_{N-1}), \quad x_N = (x_0, x_1, \ldots, x_N) \] 
+
+Now if we sub the constraints to the cost function, we get the unconstrained problem:
+
+\[J(u_N, x_N) = \left(\frac{1}{2} (\bar{A}x + \bar{B}u_N)^T \bar{Q} (\bar{A}x + \bar{B}u_N) + \frac{1}{2} u_N \bar{R} u_N\right) \]
+
+Now we expand the cost function and drop the constant term:
+
+\[ \frac{1}{2} \bar{x}^T \bar{A}^TQ\bar{A}x \]
+
+So we get:
+
+\[ P_N(x) : minimise \frac{1}{2} U_N^T (\bar{R} + \bar{B}^T\bar{Q}\bar{B})U_N + (\bar{B}^T\bar{Q}\bar{A}x)^TU_N \]
+
+ This is a quadratic optimisation problem with Hessian 
+ 
+ \[  H  = \bar{R} + \bar{B}^T\bar{Q}\bar{B} \]
+ 
+ uN*  is a minimiser if \[ ( \bar{R} + \bar{B}^T\bar{Q}\bar{B} ) U_N^* + \bar{B}^TQ\bar{A}x = 0 \]
+ 
+ So:
+ 
+ \[ U_N^* (x) = - (\bar{R} + \bar{B}^T\bar{Q}Ax) \]
+
+We can get the optimal sequence of states through:
+
+\[ x = \bar{A} x+ \bar{B}U_N \]
+
+ Thus:
+ 
+ \[ x_N^* (x) = (\bar{A} - \bar{B} (\bar{R} + \bar{B}^T\bar{Q}\ \bar{B})^-1 \bar{B}^T\bar{Q}\bar{A})x \]
+ 
+ The optimal value will be the cost function at the optimal trajectory (Given by x* and u*)
+
+ 
+ 
+ 1.2 
+ 
+\[ x_{t+1} = \begin{bmatrix}
+1 & 1 & 0 \\
+0 & 1 & 1 \\
+0 & 0 & 1
+\end{bmatrix} x_t+ 
+\begin{bmatrix} 0 \\
+0 \\
+1 \end{bmatrix} u_t
+ \]
+ 
+ The controllability matrix C is given by
+ 
+\[ \begin{bmatrix}
+A^2B & AB & B
+\end{bmatrix} \] 
+ 
+ Where A is our square matrix and B is our input matrix. The controllability matrix is then:
+ 
+ \[ C = \begin{bmatrix}
+ 0 & 1 & 0 \\
+ 1 & 1 & 0 \\
+ 2 & 0 & 1 \end{bmatrix}
+ \] 
+ 
+ To determine if the system is reachable/controllable, we need to show that the determinant of this matrix is not zero. If it is non=zero, it means that the columns in the matrix are linearly independent. Or, the span of the matrices B, AB and A2B covers the entire state space. When this is non-zero, it indicates that there exists a unique combination of control inputs that can drive the system to any desired state. 
+ 
+ The determinant of the controllability matrix is simply -1. Because it is non-zero, the system is controllable / reachable.  (Det was found on MATLAB using det(C)) 
+ 
+ To get the control sequence, we need to solve :
+ 
+ \[ c . u = x' - A^3x \]
+ 
+ And so:
+ 
+ 
+ \[ \begin{bmatrix}
+ 0 & 1 & 0 \\
+ 1 & 1 & 0 \\
+ 2 & 0 & 1 \end{bmatrix} \begin{bmatrix}
+ u1 \\
+ u2 \\
+ u3 \end{bmatrix} = \begin{bmatrix} 
+ 1 \\
+ 2 \\
+ 0 \end{bmatrix} - \begin{bmatrix} 
+ 0 & 1 & 2 \\
+ 1 & 3 & 3 \\
+ 2 & 3 & 1 
+ \end{bmatrix} \begin{bmatrix} 
+ 1 \\
+ 1 \\
+ 1
+ \end{bmatrix} \]
+ 
+ 
+ Solving for U, we get
+ 
+ \[ U  = \begin{bmatrix}
+ -3 \\
+ -2 \\
+ 0
+ \end{bmatrix} \]
+ 
+ This is the control sequence for the system.
+  
+  
+  2.1 
+  
+  
+We can say:
+
+\[ l(x, u) = \frac{1}{2} (x_t^T Q x_t + u_t^T R u_t) + q^Tx_t + r^Tu_t \]
+
+\[ V(x) = \frac{1}{2} x_N^T P_f  x_N + q_f^Tx_N \] 
+
+Where:
+ 
+\[ f(x, u) = Ax + Bu \]
+
+
+First we define:
+
+\[ V_0^* (x) = \frac{1}{2} x_N^T P_f x_N + q_f^T x_N \]
+
+Now, we can say : 
+
+\[ V_1^* (x) = \min_u(l(x, u) + V_0^*(f(x, u)) \]
+
+Thus:
+
+
+\[  V_1^* (x) = min(\frac{1}{2}(x^T Q x_t + u_t^T R u_t) + q^T x_t + r^T u_t + \frac{1}{2} (Ax + Bu + c)^T P_f (Ax + Bu + c)) + q_f^T(Ax + Bu) \] 
+
+
+Expand this:
+
+
+\[  V_1^* (x) = min(\frac{1}{2} x^T Q x_t + \frac{1}{2} u_t^T R u_t + q^Tx_t + r^T u_t + \frac{1}{2} x^T A^TP_f A + \frac{1}{2} u^TB^TP_fBu + x^TA^TP_fBu_t + q_f^T A x + q_f^T Bu \]
+
+Rearrange;
+
+\[  V_1^* (x) = min(\frac{1}{2} x_t^T(Q + A^T P_f A) x_t + \frac{1}{2} u_t^T(R + B^T P_f B) u_t + x_t^T A^T P_f B u_t + q^T x_t + r^T u_t + q_f^T A x + q_f^T B u_t \]
+
+Now we set the gradient equal to 0, a lot of terms are constant so their gradient will be 0.
+
+\[ \nabla (V_1^* (x)) = (R + B^T P_f B) u^*  = -B^T P_f A x  \] 
+
+
+We can define kappa, 
+
+\[ \kappa_1^* (x) = \kappa_1 x \] 
+
+\[ k_1 = -(R + B^T P_f B)^-1 B^T P_f A \]
+
+Now, we minimise:
+
+\[ V_1^* (x) = \frac{1}{2} x-t^T(Q + A^T P_f A) x_t + \frac{1}{2} x^T k_1^T (R + B^T P_f B) \kappa_1 x_t  + x_t^T A^T P_f B \kappa_1 x_t + q^T x_t + r^T \kappa_1 x_t + q_f^T A x_t + q_f^T B \kappa_1x_t \]
+
+3.1
+
+We have :
+
+\[ x_{t+1} = Ax_t + Bu_t \] 
+
+\[ reach_{k+1} (x) \subset reach_k (x) \] 
+
+Yes it is generally true that for every x, the set of states the system can reach in k + 1 steps, will be a superset of the set of states the system can reach in k steps. 
+
+We can consider the dynamics:
+
+\[ x_{t+1} = Ax_t + Bu_t \] 
+
+The set:
+
+\[ reach_{k+1} (x) \] 
+
+consists of all possible states x (t+1) that can be reached in k+1 steps starting from x. Each element can be obtained by applying the system dynamics for k+1 steps.
+
+Now, if we consider
+\[ reach_{k} (x)\] 
+
+, which consists of all possible states x(t+1) that can be reached in k+1 steps. If we take any state y in reach(k)(x), it can be reached by applying the dynamics for k steps from the initial state x.  
+
+Therefor, the set of states reachable in k+1 steps is always at least as large as the set of states reachable in k steps for any initial state.
+
+
+It is generally true for systems that are linear are time invariant. However, there are conditions that must be satisfied for it to hold. First of all, the system must be controllable, that is, there exists a control sequence to move the system from any initial state to any final state in a finite amount of time. 
+
+To provide an example of when the condition doesn't hold, we can look at a system that is not fully controllable.:
+
+\[ x_t+1 = \begin{bmatrix}
+1 & 1 \\
+0 & 1
+\end{bmatrix} x_t + \begin{bmatrix}
+1 \\
+0
+\end{bmatrix} u_t \]
+
+Since B has a 0 in entry 2, it wont depend on the input sequence and so won't be controllable. If we consider the reachability states:
+
+
+\[ reach_1 (x) = (Ax + Bu) \]
+
+\[ reach_2 (x) = (A^2x + A Bu) \]
+
+Since the second state doesn't depend on the control input (B has a 0), reach2 will not contain the all the states in reach1.
+
+
+
+3.2
+
+We can use Null-Space to solve optimisation problems with linear constraints, the procedure is as follows:
+
+1. State Augmentation
+
+We can introduce a new decision variable z such that x = Tz, where T is a matrix that spacs the nullspace of A.
+
+This transformation allows us to express the state x as a linear combination of the nullspace of A. 
+\hspace{20 mm}
+
+2. Reformulate the dynamics
+
+We can substitute x = Tz into the dynamics equation :
+
+\[ x_{t+1} = Ax_t + Bu_t + c \] 
+
+This results in a new set of dynamics in terms of the augmented variable z.
+
+\hspace{20 mm}
+
+3. Transform the cost function
+Express the cost function in terms of the augmented variable z. We do this by subbing x=Tz into the cost.
+\hspace{20 mm}
+
+4. Solve the reduced problem.
+- Transformed problem will have lower dimensionality since the nullspace eliminates some variables. We can solve it using standard optimisation techniques.
+
+\hspace{20 mm}
+
+5. Recover the solution for original problem:
+
+We can use the solution for the reduced problem to obtain the optimal control sequence u and the corresponding state sequence x.
+
+Finally we can recover x from z using our nullspace matrix.
+  
+  In terms of preference, it depends on the type of problem - Specifically around problem structure, computational requirements and numerical stability.
+  \hspace{20 mm}
+  
+  The null-space method is suitable for:
+  
+  1. Problems with linear constraints.
+  \hspace{20 mm}
+  2. It can handle large scale problems
+  \hspace{20 mm}
+  3. Is numerically stable.
+  
+ \hspace{20 mm}
+ 
+ 
+ 
+ However the nullspace requires prior knowledge of the system matrix A and involves a transformation step. 
+  
+  
+  \hspace{20 mm}
+  
+  Eliminitation is suitable for:
+  
+  1. Problems with explicit state dynamics.
+  
+  It can be efficient under certain circumstances, however may require specialised techniques for handling contraints.
+  
+  
+  
+  
+  \hspace{20 mm}
+  
+ Dynamic programming is suitable for problems with a sequential decision structure. It isd good as it guarentees global optimality. however is computationally expensive since it is recursive.
+ 
+
+ 
+\end{document}

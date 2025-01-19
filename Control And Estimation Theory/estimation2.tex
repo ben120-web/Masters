@@ -1,0 +1,43 @@
+\documentclass{article}
+\usepackage{amsmath, amssymb}
+
+\begin{document}
+
+\section*{2.7 Radiation Level Calculation}
+
+Given that the radiation level exceeds $120\, \mu\text{Sv}/\text{day}$, we seek to calculate the conditional expectation $E[X | X > 120]$, where $X$ represents the daily radiation level. This expectation will then be converted to an hourly rate by dividing by the total number of hours in a day.
+
+\subsection*{Daily Conditional Expectation}
+
+The conditional expectation of $X$ given $X > 120$ can be found using the properties of the normal distribution. This calculation involves integrating the tail of the normal distribution beyond $120\, \mu\text{Sv}/\text{day}$, weighted by the radiation level, and normalized by the probability of exceeding this threshold. Mathematically, this is expressed as:
+\[ E[X | X > 120] = \mu + \sigma \frac{\phi\left(\frac{120 - \mu}{\sigma}\right)}{1 - \Phi\left(\frac{120 - \mu}{\sigma}\right)}, \]
+where $\phi$ and $\Phi$ represent the standard normal probability density function and cumulative distribution function, respectively.
+
+\subsection*{Conversion to Hourly Rate}
+
+To find the expected radiation level per hour, we divide the conditional daily expectation by 24:
+\[ E[X_{\text{hour}} | X > 120] = \frac{E[X | X > 120]}{24}. \]
+
+\section*{Conclusion}
+
+This calculation provides the expected radiation level per hour under the condition that the daily radiation level exceeds the alarm threshold of $120\, \mu\text{Sv}/\text{day}$. It leverages the properties of the normal distribution and the concept of conditional expectation.
+
+\section*{3) (Bonus) Introduction to \(Y = (X, X)\)}
+
+Consider $X$ as a continuous real-valued random variable and define $Y = (X, X)$, which maps $X$ into a two-dimensional space, $\mathbb{R}^2$. We aim to show that $Y$ is not a continuous random variable in $\mathbb{R}^2$ and to describe the probability distribution of $Y$.
+
+\section*{Continuity of \(Y\)}
+
+A continuous random variable in $\mathbb{R}^2$ would have a probability density function (pdf) that assigns probabilities to regions in the plane. For $Y$ to be considered continuous, it would need a pdf $f_Y(y_1, y_2)$ such that the probability $P((Y_1, Y_2) \in A)$ for any region $A$ in $\mathbb{R}^2$ is given by the integral of $f_Y$ over $A$.
+
+However, the transformation $Y = (X, X)$ implies that all probability mass of $Y$ is concentrated on the line $y_1 = y_2$ in $\mathbb{R}^2$, with zero probability mass elsewhere. This characteristic precludes $Y$ from having a conventional two-dimensional pdf, indicating that $Y$ is not a continuous random variable in the typical sense used in $\mathbb{R}^2$.
+
+\section*{Distribution of \(Y\)}
+
+Although $Y$ does not have a standard two-dimensional pdf, its distribution can still be described. Given that $X$ has a pdf $f_X(x)$, the distribution of $Y$ is such that all probability is concentrated along the line $y_1 = y_2$. This means that for any function of $Y$, say $g(Y)$, the expectation $E[g(Y)]$ would depend on the distribution of $X$ and can be computed considering $Y$'s unique concentration of probability.
+
+\section*{Conclusion}
+
+The random variable $Y = (X, X)$ illustrates a case where, despite originating from a continuous random variable $X$, the resultant $Y$ does not conform to the definition of a continuous random variable in $\mathbb{R}^2$. Its distribution is uniquely defined by the line $y_1 = y_2$ and is directly related to the probability distribution of $X$.
+
+\end{document}

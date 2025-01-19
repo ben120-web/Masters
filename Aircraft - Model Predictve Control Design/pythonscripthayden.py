@@ -1,0 +1,1 @@
+import qpsolvers as qp

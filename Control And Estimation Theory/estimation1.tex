@@ -1,0 +1,277 @@
+\documentclass{article}
+\usepackage{amsmath, amssymb}
+\begin{document}
+
+1.1)
+
+To show that:
+\begin{enumerate}
+    \item \(Var[aX] = a^2 Var[X]\),
+    \item \(Var[X + a] = Var[X]\),
+\end{enumerate}
+we start by recalling the definition of the variance of a random variable \(X\), which is \(Var[X] = E[(X - E[X])^2]\), where \(E[X]\) denotes the expected value of \(X\).
+
+\textbf{(i)} For the variance of \(aX\), we compute:
+\begin{align*}
+Var[aX] &= E[((aX) - E[aX])^2] \\
+&= E[a^2(X - E[X])^2] \quad \text{(since \(E[aX] = aE[X]\))} \\
+&= a^2 E[(X - E[X])^2] \\
+&= a^2 Var[X].
+\end{align*}
+
+\textbf{(ii)} For the variance of \(X + a\), we compute:
+\begin{align*}
+Var[X + a] &= E[((X + a) - E[X + a])^2] \\
+&= E[((X + a) - (E[X] + a))^2] \\
+&= E[(X - E[X])^2] \\
+&= Var[X].
+\end{align*}
+
+Thus, we have shown that \(Var[aX] = a^2 Var[X]\) and \(Var[X + a] = Var[X]\).
+
+
+1.2)
+
+We consider a real-valued random variable that follows the exponential distribution with parameter \(\lambda > 0\). The probability density function (pdf) \(p_X(x)\) is given by:
+\[ p_X(x) = \begin{cases} 
+0, & \text{for } x < 0 \\
+\lambda e^{-\lambda x}, & \text{for } x \geq 0
+\end{cases} \]
+
+To show that \(p_X(x)\) is a well-defined pdf, we need to verify the following conditions:
+\begin{enumerate}
+    \item \(p_X(x) \geq 0\) for all \(x\).
+    \item The integral of \(p_X(x)\) over the entire real line equals 1.
+\end{enumerate}
+
+\textbf{Verification of Condition 1:}
+It's clear from the definition of \(p_X(x)\) that for \(x < 0\), \(p_X(x) = 0\), and for \(x \geq 0\), \(p_X(x) = \lambda e^{-\lambda x}\), where \(\lambda e^{-\lambda x} > 0\) since \(\lambda > 0\) and the exponential function is always positive. Thus, \(p_X(x) \geq 0\) for all \(x\).
+
+\textbf{Verification of Condition 2:}
+We compute the integral of \(p_X(x)\) over the entire real line:
+\begin{align*}
+\int_{-\infty}^{\infty} p_X(x) dx &= \int_{-\infty}^{0} 0 dx + \int_{0}^{\infty} \lambda e^{-\lambda x} dx \\
+&= \int_{0}^{\infty} \lambda e^{-\lambda x} dx \\
+&= \left[ -e^{-\lambda x} \right]_{0}^{\infty} \\
+&= -(0 - 1) \\
+&= 1.
+\end{align*}
+
+Since both conditions are satisfied, \(p_X(x)\) is a well-defined probability density function for the exponential distribution with parameter \(\lambda\).
+
+1.3)
+
+Consider an \(\mathbb{R}^n\)-valued random variable \(X\) and a constant matrix \(A \in \mathbb{R}^{m \times n}\). We want to show that for the transformed variable \(Y = AX\), the variance-covariance matrix of \(Y\) satisfies \(Var[Y] = A Var[X]A^T\).
+
+The variance-covariance matrix of a multivariate random variable \(X\) is defined as \(Var[X] = E[(X - E[X])(X - E[X])^T]\). For \(Y = AX\), we compute \(Var[Y]\) as follows:
+\begin{align*}
+Var[Y] &= Var[AX] \\
+       &= E[((AX) - E[AX])((AX) - E[AX])^T] \\
+       &= E[(AX - AE[X])(AX - AE[X])^T] \quad \text{(since \(E[AX] = AE[X]\) by linearity of expectation)} \\
+       &= E[(A(X - E[X]))(A(X - E[X]))^T] \\
+       &= E[A(X - E[X])(X - E[X])^T A^T] \\
+       &= A E[(X - E[X])(X - E[X])^T] A^T \quad \text{(moving \(A\) and \(A^T\) outside the expectation)} \\
+       &= A Var[X] A^T.
+\end{align*}
+
+Thus, we have shown that \(Var[AX] = A Var[X]A^T\), using the definition of the variance-covariance matrix of a multivariate random variable.
+
+1.5)
+
+Suppose \(X\) is an \(\mathbb{R}^3\)-valued random variable that follows the multivariate normal distribution with \(\mathbb{E}[X] = 0\) and
+\[ Var[X] = \begin{pmatrix}
+5 & 1 & 2 \\
+1 & 9 & -3 \\
+2 & -3 & 4
+\end{pmatrix}. \]
+
+\section*{(i) Positive Definiteness of \(Var[X]\)}
+To verify that \(Var[X]\) is positive definite, we need to check that all leading principal minors of the matrix are positive.
+
+The leading principal minors are:
+\begin{itemize}
+    \item \(D_1 = 5\),
+    \item \(D_2 = \begin{vmatrix}
+5 & 1 \\
+1 & 9
+\end{vmatrix} = 45 - 1 = 44\),
+    \item \(D_3 = \begin{vmatrix}
+5 & 1 & 2 \\
+1 & 9 & -3 \\
+2 & -3 & 4
+\end{vmatrix}.\)
+\end{itemize}
+Computing \(D_3\) gives us:
+\[ D_3 = 5(36) - 1(-3 - 6) + 2(3 - 9) = 180 + 9 - 12 = 177. \]
+
+Since all leading principal minors (\(D_1\), \(D_2\), and \(D_3\)) are positive, \(Var[X]\) is positive definite.
+
+2.1)
+
+Given an \(\mathbb{R}^n\)-valued random variable \(X\) with variance matrix
+\[ Var[X] = \begin{pmatrix}
+1 & 1 & 1 \\
+1 & 5 & 3 \\
+1 & 3 & 11
+\end{pmatrix}, \]
+we aim to determine \(\mathbb{E}[\|X\|^2]\).
+
+\section*{Solution}
+
+The expected value of the squared norm of \(X\), \(\mathbb{E}[\|X\|^2]\), can be found by summing the diagonal elements of the variance-covariance matrix \(Var[X]\) because \(\mathbb{E}[\|X\|^2]\) is the sum of the variances of \(X\)'s components when assuming \(\mathbb{E}[X] = 0\), or more generally, includes the squares of the expectations of \(X\)'s components. 
+
+Given the variance matrix, the sum of its diagonal elements (variances of each component) is
+\[ \sigma^2_1 + \sigma^2_2 + \sigma^2_3 = 1 + 5 + 11 = 17. \]
+
+Therefore, assuming \(\mathbb{E}[X] = 0\) (or not considering the means if they are not provided),
+\[ \mathbb{E}[\|X\|^2] = 17. \]
+
+This concludes the determination of \(\mathbb{E}[\|X\|^2]\) based on the given variance matrix for \(X\).
+
+2.2)
+Given that \(X, Y\) are independent real-valued random variables with \(X, Y \sim \mathcal{N}(0, 1)\), and \(Z\) is an independent random variable following the exponential distribution with parameter \(\lambda = 1\), we aim to determine \(\mathbb{E}[X^2Y^2 + 1 | Z = 1]\).
+
+\section*{Solution}
+
+Since \(X\), \(Y\), and \(Z\) are independent, the condition \(Z = 1\) does not influence the distributions or expectations involving \(X\) and \(Y\). Thus, we can directly compute \(\mathbb{E}[X^2Y^2 + 1]\) without considering the condition on \(Z\).
+
+The expectation \(\mathbb{E}[X^2Y^2 + 1]\) can be decomposed as:
+\[ \mathbb{E}[X^2Y^2] + \mathbb{E}[1]. \]
+
+Given \(X, Y \sim \mathcal{N}(0, 1)\), we know that \(X^2\) and \(Y^2\) follow a Chi-squared distribution with 1 degree of freedom, which has an expected value of 1. Therefore, we have:
+\[ \mathbb{E}[X^2] = \mathbb{E}[Y^2] = 1. \]
+
+Since \(X\) and \(Y\) are independent, the expected value of their product is the product of their expected values:
+\[ \mathbb{E}[X^2Y^2] = \mathbb{E}[X^2] \cdot \mathbb{E}[Y^2] = 1 \cdot 1 = 1. \]
+
+Thus, we obtain:
+\[ \mathbb{E}[X^2Y^2 + 1] = 1 + 1 = 2. \]
+
+Therefore, regardless of the condition \(Z = 1\), \(\mathbb{E}[X^2Y^2 + 1 | Z = 1] = 2\).
+
+2.3)
+\section*{Introduction}
+Consider a random variable \(X\) that follows the exponential distribution with rate parameter \(\lambda = 0.5\), denoted by \(X \sim \text{Exp}(0.5)\). We aim to determine the conditional expectation \(\mathbb{E}[X | X > 1.5]\).
+
+\section*{Memoryless Property and Conditional Expectation}
+The exponential distribution is known for its memoryless property, which can be stated as:
+\[ P[X \geq a + b | X \geq a] = P[X \geq b], \]
+for any \(a, b \geq 0\). This property implies that the future behavior of \(X\) does not depend on how much time has already elapsed.
+
+Furthermore, the memoryless property allows us to express the conditional expectation \(\mathbb{E}[X | X > a]\) as:
+\[ \mathbb{E}[X | X > a] = a + \frac{1}{\lambda}, \]
+for any \(a \geq 0\).
+
+\section*{Calculation of \(\mathbb{E}[X | X > 1.5]\)}
+Given \(X \sim \text{Exp}(0.5)\) and using the memoryless property, we calculate the conditional expectation \(\mathbb{E}[X | X > 1.5]\) as follows:
+\begin{align*}
+\mathbb{E}[X | X > 1.5] &= 1.5 + \frac{1}{\lambda} \\
+&= 1.5 + \frac{1}{0.5} \\
+&= 1.5 + 2 \\
+&= 3.5.
+\end{align*}
+
+\section*{Conclusion}
+The conditional expectation \(\mathbb{E}[X | X > 1.5]\) for a random variable \(X\) following the exponential distribution with \(\lambda = 0.5\) is 3.5. This result utilizes the unique memoryless property of the exponential distribution to calculate future expectations based on past conditions.
+
+
+2.4)
+Consider a random variable \(X\) that follows an exponential distribution with parameter \(\lambda > 0\), denoted by \(X \sim \text{Exp}(\lambda)\). We aim to prove that for any \(a, b \geq 0\),
+\[ P[X \geq a + b | X \geq a] = P[X \geq b]. \]
+
+\section*{Proof}
+
+The memoryless property of the exponential distribution states that the probability of the event occurring after a certain time does not depend on how much time has already elapsed. Mathematically, this can be expressed as:
+\[ P[X \geq a + b | X \geq a] = P[X \geq b]. \]
+
+To prove this, we start by calculating \(P[X \geq a + b | X \geq a]\) using the definition of conditional probability:
+\[ P[X \geq a + b | X \geq a] = \frac{P[X \geq a + b \cap X \geq a]}{P[X \geq a]}. \]
+
+Since \(X \geq a + b\) implies \(X \geq a\), we have \(P[X \geq a + b \cap X \geq a] = P[X \geq a + b]\). Thus,
+\[ P[X \geq a + b | X \geq a] = \frac{P[X \geq a + b]}{P[X \geq a]}. \]
+
+For an exponential distribution with parameter \(\lambda\), the probability that \(X \geq x\) is given by the survival function:
+\[ P[X \geq x] = e^{-\lambda x}. \]
+
+Therefore,
+\[ P[X \geq a + b] = e^{-\lambda(a + b)}, \]
+and
+\[ P[X \geq a] = e^{-\lambda a}. \]
+
+Substituting these into the conditional probability gives:
+\[ P[X \geq a + b | X \geq a] = \frac{e^{-\lambda(a + b)}}{e^{-\lambda a}} = e^{-\lambda b} = P[X \geq b]. \]
+
+Hence, we have proven that \(P[X \geq a + b | X \geq a] = P[X \geq b]\), which is a demonstration of the memoryless property of the exponential distribution.
+
+
+2.5)
+
+Consider a four-dimensional random variable \(Z = (Z_1, Z_2, Z_3, Z_4)\) that follows the multivariate normal distribution, \(Z \sim \mathcal{N}(\mu, \Sigma)\), with \(\mu = (1, 2, 3, 4)\) and covariance matrix \(\Sigma\) given by
+\[ \Sigma = \begin{pmatrix}
+1.0 & 0.35 & 0.32 & 0.39 \\
+0.35 & 0.84 & 0.3 & 0.26 \\
+0.32 & 0.3 & 0.77 & 0.23 \\
+0.39 & 0.26 & 0.23 & 0.83
+\end{pmatrix}. \]
+
+\section*{(i) Conditional Expectation of \((X_1, X_3)\) given \(X_2 = x_2\) and \(X_4 = x_4\)}
+
+The conditional expectation \(E[(X_1, X_3) | X_2 = x_2, X_4 = x_4]\) can be determined by partitioning \(\mu\) and \(\Sigma\) into corresponding subvectors and submatrices. Specifically, for a partitioned vector and matrix:
+\[ \mu = \begin{pmatrix} \mu_1 \\ \mu_2 \end{pmatrix}, \quad \Sigma = \begin{pmatrix} \Sigma_{11} & \Sigma_{12} \\ \Sigma_{21} & \Sigma_{22} \end{pmatrix}, \]
+where \(\mu_1\) and \(\Sigma_{11}\) correspond to \((X_1, X_3)\), and \(\mu_2\) and \(\Sigma_{22}\) correspond to \((X_2, X_4)\), the conditional expectation is given by:
+\[ E[(X_1, X_3) | X_2 = x_2, X_4 = x_4] = \mu_1 + \Sigma_{12} \Sigma_{22}^{-1} (x_2, x_4 - \mu_2). \]
+
+Given the specific values of \(\mu\) and \(\Sigma\), the computation involves substituting these values into the formula.
+
+\section*{(ii) Conditional PDF of \((X_1, X_3)\) given \(X_2 = x_2\) and \(X_4 = x_4\)}
+
+The conditional pdf \(p_{X_1,X_3|X_2,X_4}(x_1, x_3 | x_2, x_4)\) can be derived using the partitioned covariance matrix \(\Sigma\). The pdf is a multivariate normal with mean and covariance matrix obtained from the conditional expectation and variance calculations in part (i). The detailed formula requires additional steps, involving the inversion of \(\Sigma_{22}\) and calculation of the reduced covariance matrix for \((X_1, X_3)\).
+
+\section*{(iii) Conditional Expectation of \(X_2\) given \(X_3 = 0.2\) and \(X_4 = -0.15\)}
+
+Similar to part (i), the conditional expectation \(E[X_2 | X_3 = 0.2, X_4 = -0.15]\) can be calculated by appropriately partitioning \(\mu\) and \(\Sigma\). For the specific condition, the expectation is given by:
+\[ E[X_2 | X_3 = 0.2, X_4 = -0.15] = \mu_2 + \Sigma_{21} \Sigma_{11}^{-1} (0.2, -0.15 - \mu_1). \]
+
+This requires calculating the inverse of the relevant submatrix of \(\Sigma\) and applying it to the difference between the conditioned values and their corresponding means.
+
+\textit{Note:} The actual numerical computations for these expectations and the conditional pdf involve matrix algebra and are not explicitly detailed in this template.
+
+\section*{2.7 Radiation Level Calculation}
+
+Given that the radiation level exceeds $120\, \mu\text{Sv}/\text{day}$, we seek to calculate the conditional expectation $E[X | X > 120]$, where $X$ represents the daily radiation level. This expectation will then be converted to an hourly rate by dividing by the total number of hours in a day.
+
+\subsection*{Daily Conditional Expectation}
+
+The conditional expectation of $X$ given $X > 120$ can be found using the properties of the normal distribution. This calculation involves integrating the tail of the normal distribution beyond $120\, \mu\text{Sv}/\text{day}$, weighted by the radiation level, and normalized by the probability of exceeding this threshold. Mathematically, this is expressed as:
+\[ E[X | X > 120] = \mu + \sigma \frac{\phi\left(\frac{120 - \mu}{\sigma}\right)}{1 - \Phi\left(\frac{120 - \mu}{\sigma}\right)}, \]
+where $\phi$ and $\Phi$ represent the standard normal probability density function and cumulative distribution function, respectively.
+
+\subsection*{Conversion to Hourly Rate}
+
+To find the expected radiation level per hour, we divide the conditional daily expectation by 24:
+\[ E[X_{\text{hour}} | X > 120] = \frac{E[X | X > 120]}{24}. \]
+
+\section*{Conclusion}
+
+This calculation provides the expected radiation level per hour under the condition that the daily radiation level exceeds the alarm threshold of $120\, \mu\text{Sv}/\text{day}$. It leverages the properties of the normal distribution and the concept of conditional expectation.
+
+\section*{3) (Bonus) Introduction to \(Y = (X, X)\)}
+
+Consider $X$ as a continuous real-valued random variable and define $Y = (X, X)$, which maps $X$ into a two-dimensional space, $\mathbb{R}^2$. We aim to show that $Y$ is not a continuous random variable in $\mathbb{R}^2$ and to describe the probability distribution of $Y$.
+
+\section*{Continuity of \(Y\)}
+
+A continuous random variable in $\mathbb{R}^2$ would have a probability density function (pdf) that assigns probabilities to regions in the plane. For $Y$ to be considered continuous, it would need a pdf $f_Y(y_1, y_2)$ such that the probability $P((Y_1, Y_2) \in A)$ for any region $A$ in $\mathbb{R}^2$ is given by the integral of $f_Y$ over $A$.
+
+However, the transformation $Y = (X, X)$ implies that all probability mass of $Y$ is concentrated on the line $y_1 = y_2$ in $\mathbb{R}^2$, with zero probability mass elsewhere. This characteristic precludes $Y$ from having a conventional two-dimensional pdf, indicating that $Y$ is not a continuous random variable in the typical sense used in $\mathbb{R}^2$.
+
+\section*{Distribution of \(Y\)}
+
+Although $Y$ does not have a standard two-dimensional pdf, its distribution can still be described. Given that $X$ has a pdf $f_X(x)$, the distribution of $Y$ is such that all probability is concentrated along the line $y_1 = y_2$. This means that for any function of $Y$, say $g(Y)$, the expectation $E[g(Y)]$ would depend on the distribution of $X$ and can be computed considering $Y$'s unique concentration of probability.
+
+\section*{Conclusion}
+
+The random variable $Y = (X, X)$ illustrates a case where, despite originating from a continuous random variable $X$, the resultant $Y$ does not conform to the definition of a continuous random variable in $\mathbb{R}^2$. Its distribution is uniquely defined by the line $y_1 = y_2$ and is directly related to the probability distribution of $X$.
+
+
+\end{document}

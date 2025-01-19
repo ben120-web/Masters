@@ -1,0 +1,427 @@
+\documentclass{article}
+\usepackage{amsmath}
+\usepackage{graphicx}
+\usepackage{bbm}
+\graphicspath{ {./images/} }
+
+\begin{document}
+
+1.1
+
+Figure 1 below shows the simulation result.
+
+\includegraphics[scale =0.5] {Q1}
+
+1.2 
+
+Given the special structure of the matrix in the discrete-time linear dynamical system, we can determine the stability of the origin without explicitly calculating the eigenvalues. The system matrix is:
+
+\[
+\begin{bmatrix}
+0.1 & 0 & 0 & 0 & 0 & 0 \\
+0 & 0.2 & 0.3 & 0 & 0 & 0 \\
+0 & -0.3 & 0.2 & 0 & 0 & 0 \\
+0 & 0 & 0 & 0.9 & 10 & 20 \\
+0 & 0 & 0 & 0 & -0.1 & 50 \\
+0 & 0 & 0 & 0 & 0 & -0.9 \\
+\end{bmatrix}
+\]
+
+This matrix is composed of three blocks:
+
+1. A \(1 \times 1\) block: \([0.1]\).
+2. A \(2 \times 2\) block: 
+   \[
+   \begin{bmatrix}
+   0.2 & 0.3 \\
+   -0.3 & 0.2 \\
+   \end{bmatrix}
+   \].
+3. A \(3 \times 3\) block:
+   \[
+   \begin{bmatrix}
+   0.9 & 10 & 20 \\
+   0 & -0.1 & 50 \\
+   0 & 0 & -0.9 \\
+   \end{bmatrix}
+   \].
+
+In such a block diagonal matrix, the eigenvalues are simply the eigenvalues of its diagonal blocks:
+
+- For the \(1 \times 1\) block, the eigenvalue is \(0.1\).
+- For the \(2 \times 2\) block, the eigenvalues are those of the \(2 \times 2\) matrix, but we don't need to calculate them explicitly as they will be complex with a magnitude less than 1 (since the coefficients are small).
+- For the \(3 \times 3\) block, it's an upper triangular matrix, and the eigenvalues of such a matrix are the entries on its main diagonal, which are \(0.9\), \(-0.1\), and \(-0.9\).
+
+Since all the diagonal elements (and hence the eigenvalues) of these blocks have absolute values less than 1, the system is stable at the origin. This is because, in a discrete-time system, stability is ensured if all eigenvalues of the system matrix have magnitudes less than 1.
+
+
+1.3
+
+To prove that all sets of the form:
+
+\[ X = \{x \in \mathbbm{R}^n : \lVert x \rVert_2 < \rho\} \]
+
+ 
+ are invariant for the given system, we need to show that if:
+ 
+ \[ x_t \in \mathbbm{X} \] 
+ 
+ Then 
+ 
+\[ x_{t+1} \in \mathbbm{X} \]
+
+for any t.
+
+Now if :
+
+ \[ x_t \in \mathbbm{X} \] 
+ 
+ Then:
+ 
+ \[ ||x_t||_2 < \rho \]
+ 
+ We want to show that :
+ 
+ \[ ||x_{t+1} ||_2 < \rho \]
+ 
+ Given the system dynamics :
+ 
+ \[ x_{t+1} = Ux_t \]
+ 
+ we can compute the Euclidean norm squared of x(t+1):
+ 
+ \[ ||x_{t+1}||_2^2 = (Ux_t)^TUx_t = x_t^TU^TUx_t \]
+ 
+ Now since U is orthogonal:
+ 
+ \[ UU^T = U^TU = 1 \] 
+ 
+ We have:
+ 
+ \[ ||x_{t+1} ||_2^2 = x_t^Tx_t \]
+ 
+ Which implies that the squared euclidean norm of x(t+1) is equal to the squared euclidean norm of x(t):
+ 
+ \[ || x_{t+1} ||_2 = ||x_t||_2 \]
+ 
+ Now since:
+ 
+ \[ ||x_t||_2 < p \]
+ 
+ It follows that :
+ 
+ \[ ||x_{t+1}||_2 < p \]
+ 
+ Therfore:
+ 
+ \[ x_t \in \mathbbm{X} \]
+ 
+ Then
+ 
+ \[ x_{t+1} \in \mathbbm{X} \]
+ 
+ So the set is invariant.
+ 
+ 1.4 
+ 
+ To verify whether the origin is a locally exponentially stable equilibrium point of the given system using the Linearization Theorem, we first linearize the system around the equilibrium point, which in this case is the origin \((0, 0)\). The system is given by:
+
+\[
+\begin{bmatrix}
+x_{1,t+1} \\
+x_{2,t+1}
+\end{bmatrix}
+=
+\begin{bmatrix}
+\frac{1}{2} x_{1,t} + \frac{1}{4} x_{2,t} + x_{2,1,t} + 6x^4_{1,t}x^2_{2,t} \\
+\frac{1}{2} x_{2,t} - \frac{1}{4} x_{1,t} + \sin^2(x_{1,t} + x_{2,t})
+\end{bmatrix}
+\]
+
+We linearize this system by computing the Jacobian matrix of the right-hand side functions at the equilibrium point \((0, 0)\). The Jacobian matrix \(J\) is given by:
+
+\[
+J = 
+\begin{bmatrix}
+\frac{\partial f_1}{\partial x_{1,t}} & \frac{\partial f_1}{\partial x_{2,t}} \\
+\frac{\partial f_2}{\partial x_{1,t}} & \frac{\partial f_2}{\partial x_{2,t}}
+\end{bmatrix}_{\bigg|_{(x_{1,t}, x_{2,t}) = (0, 0)}}
+\]
+
+where \(f_1\) and \(f_2\) are the functions that define the system. For this system, we have:
+
+\[
+f_1(x_{1,t}, x_{2,t}) = \frac{1}{2} x_{1,t} + \frac{1}{4} x_{2,t} + x_{2,1,t} + 6x^4_{1,t}x^2_{2,t}
+\]
+\[
+f_2(x_{1,t}, x_{2,t}) = \frac{1}{2} x_{2,t} - \frac{1}{4} x_{1,t} + \sin^2(x_{1,t} + x_{2,t})
+\]
+
+After computing the partial derivatives and evaluating them at the origin, the Jacobian matrix at \((0, 0)\) is:
+
+\[
+J =
+\begin{bmatrix}
+0.5 & 1.25 \\
+-0.25 & 0.5 \\
+\end{bmatrix}
+\]
+
+We can use MATLAB To get the eigenvalues of this Jacobian matrix, which are \(0.5 - 0.559017i\) and \(0.5 + 0.559017i\). The magnitudes of both eigenvalues are \(0.75\), which is less than \(1\). Therefore, according to the Linearization Theorem, the origin \((0, 0)\) is a locally exponentially stable equilibrium point for the given system.
+
+ 2.1
+
+To determine the invariance of the set \(X = \{x \in \mathbbm{R}^n : \|x\|^2 < R\}\) for the nonlinear dynamical system \(x_{t+1} = \alpha \|x_t\| x_t\), where \(\alpha > 0\), and then to find a Lyapunov function \(V : X \rightarrow [0, \infty)\) that shows the global asymptotic stability of the origin over \(X\), we can proceed as follows:
+
+\subsection*{1. Determining \(R\) for Invariance of \(X\)}
+For the set \(X\) to be invariant, any state \(x_t\) that starts in \(X\) must result in \(x_{t+1}\) that also lies in \(X\). In other words, if \(\|x_t\|^2 < R\), then we must have \(\|x_{t+1}\|^2 < R\).
+
+Given the system dynamics \(x_{t+1} = \alpha \|x_t\| x_t\), the norm of \(x_{t+1}\) is:
+\[
+\|x_{t+1}\| = \|\alpha \|x_t\| x_t\| = \alpha \|x_t\|^2
+\]
+For \(x_{t+1}\) to be in \(X\), we need \(\alpha \|x_t\|^2 < R\). Since \(\|x_t\|^2 < R\), the condition becomes \(\alpha R < R\) or \(\alpha < 1\). Therefore, \(R\) can be any positive number if \(\alpha < 1\).
+
+\subsection*{2. Constructing a Lyapunov Function}
+A suitable Lyapunov function for this system can be the square of the norm of the state, \(V(x) = \|x\|^2\). This function is positive definite and radially unbounded in \(X\).
+
+\subsection*{3. Showing Global Asymptotic Stability}
+To show global asymptotic stability using the Lyapunov function, we need to show that \(V(x_{t+1}) - V(x_t) < 0\) for all \(x_t \neq 0\).
+
+From the system dynamics, we have:
+\[
+V(x_{t+1}) = \|x_{t+1}\|^2 = \|\alpha \|x_t\| x_t\|^2 = \alpha^2 \|x_t\|^4
+\]
+And
+\[
+V(x_t) = \|x_t\|^2
+\]
+So, the difference is:
+\[
+V(x_{t+1}) - V(x_t) = \alpha^2 \|x_t\|^4 - \|x_t\|^2
+\]
+For global asymptotic stability, we need this difference to be negative. We can factor out \(\|x_t\|^2\) to get:
+\[
+\|x_t\|^2 (\alpha^2 \|x_t\|^2 - 1)
+\]
+Since \(\alpha < 1\), \(\alpha^2 \|x_t\|^2 - 1 < 0\) for all \(x_t \neq 0\). Therefore, \(V(x_{t+1}) - V(x_t) < 0\) for all \(x_t \neq 0\), indicating that the origin is globally asymptotically stable over \(X\).
+
+In summary, for \(\alpha < 1\), the set \(X\) is invariant, and the Lyapunov function \(V(x) = \|x\|^2\) shows that the origin is globally asymptotically stable over \(X\).
+
+
+2.2
+
+For the linear dynamical system 
+
+\[
+x_{t+1} =
+\begin{bmatrix}
+a & 0 & 0 \\
+0 & b & c \\
+0 & -c & b \\
+\end{bmatrix} x_t,
+\]
+
+with state \(x_t \in \mathbbm{R}^3\) and constants \(a, b, c \in \mathbbm{R}\), we use a quadratic Lyapunov function of the form:
+
+\[
+V(x) = x^T P x,
+\]
+
+where \(P\) is a positive definite matrix. For simplicity, we choose \(P\) as the identity matrix \(I_3\). The change in the Lyapunov function from \(x_t\) to \(x_{t+1}\) is given by:
+
+\[
+\Delta V = V(x_{t+1}) - V(x_t) = (Ax_t)^T P (Ax_t) - x_t^T P x_t,
+\]
+
+where \(A\) is the system matrix. Expanding and simplifying this expression gives:
+
+\[
+\Delta V = a^2 x_1^2 - x_1^2 - x_2^2 - x_3^2 + (b x_2 + c x_3)^2 + (b x_3 - c x_2)^2
+\]
+
+\[
+\Delta V = (a^2 - 1) x_1^2 - x_2^2 - x_3^2 + (b^2 + c^2)(x_2^2 + x_3^2)
+\]
+
+For the Lyapunov function to validate the stability, \(\Delta V\) must be negative for all \(x \neq 0\). Given the stability conditions \(|a| < 1\) and \(b^2 + c^2 < 1\):
+
+- The term \((a^2 - 1) x_1^2\) is negative because \(|a| < 1\) implies \(a^2 < 1\).
+- The term \((b^2 + c^2)(x_2^2 + x_3^2)\) is less than \(x_2^2 + x_3^2\) because \(b^2 + c^2 < 1\).
+
+Thus, \(\Delta V\) is negative for all \(x \neq 0\), confirming that the Lyapunov function \(V(x) = x^T x\) (with \(P\) as the identity matrix) demonstrates the global asymptotic stability of the origin for this system under the given conditions.
+
+
+2.3
+
+To determine an ellipsoidal invariant set for the linear system \(x_{t+1} = Ax_t\) with
+
+\[ A = \begin{bmatrix} 0.8 & 0.6 \\ -0.7 & 0.3 \end{bmatrix} \],
+
+we need to find a positive definite matrix \(P\) such that the set \(E = \{x \in \mathbbm{R}^n : x^T P x \leq 1\}\) is invariant under the system dynamics.
+
+The Lyapunov equation for this system is \(A^T P A - P = -Q\), where \(Q\) is a positive definite matrix. In this case, we'll use \(Q = \text{diag}(1, 1)\) (identity matrix).
+
+Let \(P = \begin{bmatrix} p_{11} & p_{12} \\ p_{21} & p_{22} \end{bmatrix}\). The Lyapunov equation becomes:
+
+\[
+\begin{bmatrix} 0.8 & -0.7 \\ 0.6 & 0.3 \end{bmatrix}^T \begin{bmatrix} p_{11} & p_{12} \\ p_{21} & p_{22} \end{bmatrix} \begin{bmatrix} 0.8 & -0.7 \\ 0.6 & 0.3 \end{bmatrix} - \begin{bmatrix} p_{11} & p_{12} \\ p_{21} & p_{22} \end{bmatrix} = - \begin{bmatrix} 1 & 0 \\ 0 & 1 \end{bmatrix}
+\]
+
+Now, compute the matrix products:
+
+\[
+\begin{bmatrix} 0.8 & 0.6 \\ -0.7 & 0.3 \end{bmatrix} \begin{bmatrix} p_{11} & p_{12} \\ p_{21} & p_{22} \end{bmatrix} \begin{bmatrix} 0.8 & -0.7 \\ 0.6 & 0.3 \end{bmatrix} - \begin{bmatrix} p_{11} & p_{12} \\ p_{21} & p_{22} \end{bmatrix} = - \begin{bmatrix} 1 & 0 \\ 0 & 1 \end{bmatrix}
+\]
+
+I'm unsure on to solve this numerically, so i have opted to use MATLAB control toolbox to get the P matrix elements below:
+
+\[ P = \begin{bmatrix} 
+-0.8540  &&  -0.2617 \\
+   -0.2617  && -1.1433
+\end{bmatrix} \]
+
+The figure below shows the plot.
+
+\includegraphics[scale =0.5] {q2}
+
+This plot was generated by using the P matrix we derived on MATLAB, generating points on the unit circle and applying the transformation 
+
+\[p^\frac{1}{2}\]
+to get points on the ellipsoid. np.vstack was used to get the points.
+
+
+2.4
+The statement is not true. The claim "A linear system is globally asymptotically stable if there is an \(x \in \mathbbm{R}^n\), \(x \neq 0\), such that \(\lim_{t \to \infty} \phi(t; x) = 0\)" is not necessarily valid for all linear systems.
+
+Global asymptotic stability means that the equilibrium point at the origin is stable for any initial condition in the state space. This implies that the state trajectories converge to the origin as \(t\) approaches infinity.
+
+A counterexample to the statement can be a linear system where the equilibrium point at the origin is not globally asymptotically stable. Consider the following linear system:
+
+\[
+\begin{bmatrix}
+\dot{x}_1 \\
+\dot{x}_2
+\end{bmatrix}
+=
+\begin{bmatrix}
+-1 & 0 \\
+0 & -1
+\end{bmatrix}
+\begin{bmatrix}
+x_1 \\
+x_2
+\end{bmatrix}
+\]
+
+This system has a stable equilibrium point at the origin. However, if you choose an initial condition \(x_0\) such that \(x_0 \neq 0\) and \(x_0\) does not lie on the eigenvectors corresponding to the stable eigenvalues, the trajectory may not converge to the origin as \(t \to \infty\).
+
+The existence of a single non-zero initial condition for which \(\lim_{t \to \infty} \phi(t; x) = 0\) does not guarantee global asymptotic stability for a linear system.
+
+2.5
+
+A linear system is globally exponentially stable (GES) if for some positive constants \(c_1, c_2\), and \(0 < \rho(A) < 1\), the following inequality holds for all \(t \geq 0\):
+
+\[
+\| \phi(t, x) \| \leq c_1 e^{c_2 t} \| x \|
+\]
+
+where \(\phi(t, x)\) is the state trajectory, \(x\) is the initial condition, and \(\rho(A)\) is the spectral radius of matrix \(A\).
+
+For a GES linear system with \(n = 2\) such that the Euclidean unit ball \(B = \{ x \in \mathbbm{R}^2 : \|x\| < 1 \}\) is not an invariant set, consider the following example:
+
+\[
+A = \begin{bmatrix} 0.5 & 0.5 \\ 0 & 0.5 \end{bmatrix}
+\]
+
+In this case, the spectral radius \(\rho(A) = 0.5 < 1\), indicating stability. However, the Euclidean unit ball \(B\) is not invariant because, for certain initial conditions, the state trajectories may leave the unit ball as time evolves.
+
+We can solve eigenvalues to show GES:
+
+The characteristic equation for \(A\) is \(\text{det}(A - \lambda I) = 0\), where \(I\) is the identity matrix:
+
+\[ \text{det}\left(\begin{bmatrix} 0.5 - \lambda & 0.5 \\ 0 & 0.5 - \lambda \end{bmatrix}\right) = (0.5 - \lambda)^2 = 0 \]
+
+Solving for \(\lambda\), we find that \(\lambda = 0.5\). Since the eigenvalues have real parts less than 1, the system is stable.
+
+Now, to show GES, we need to consider the exponential stability condition:
+
+\[ \| \phi(t, x) \| \leq c_1 e^{c_2 t} \| x \| \]
+
+In this case, the eigenvalues are all 0.5, and the condition is satisfied for any \(c_1, c_2\) with \(0 < c_1 < \infty\) and \(c_2 < 0.5\). The specific values for \(c_1\) and \(c_2\) will depend on the choice of norm and initial conditions.
+
+So, the matrix \(A\) is globally exponentially stable.
+
+3.1
+To prove that the origin is a locally exponentially stable equilibrium point for the nonlinear discrete-time dynamical system given by \(x_{t+1} = A x_t + g(x_t)\), where \(x_t \in \mathbbm{R}^n\), \(A \in \mathbbm{R}^{n \times n}\) has a spectral radius strictly less than 1, and the function \(g : \mathbbm{R}^n \rightarrow \mathbbm{R}^n\) satisfies the property \(\|g(x)\| \leq \beta \|x\|^2\) for all \(x \in \mathbbm{R}^n\) with \(\|x\| \leq 1\) and \(\beta > 0\), we can use a Lyapunov function.
+
+Consider the Lyapunov function \(V(x) = \|x\|^2\). We want to show that \(V(x_t)\) is decreasing along the trajectories of the system. 
+
+The difference \(V(x_{t+1}) - V(x_t)\) is given by:
+
+\[
+V(x_{t+1}) - V(x_t) = \|A x_t + g(x_t)\|^2 - \|x_t\|^2
+\]
+
+Now, use the property \(\|g(x)\| \leq \beta \|x\|^2\):
+
+\[
+V(x_{t+1}) - V(x_t) \leq \|A x_t\|^2 + 2 \langle A x_t, g(x_t) \rangle + \|g(x_t)\|^2 - \|x_t\|^2
+\]
+
+Since \(A\) has a spectral radius strictly less than 1, \(\|A x_t\| < \|x_t\), and we can replace \(\|A x_t\|^2\) with \(\rho(A)^2 \|x_t\|^2\), where \(\rho(A)\) is the spectral radius of \(A\).
+
+
+\[
+V(x_{t+1}) - V(x_t) \leq \rho(A)^2 \|x_t\|^2 + 2 \langle A x_t, g(x_t) \rangle + \|g(x_t)\|^2 - \|x_t\|^2
+\]
+
+Now, use the property \(\|g(x)\| \leq \beta \|x\|^2\):
+
+\[
+V(x_{t+1}) - V(x_t) \leq \rho(A)^2 \|x_t\|^2 + 2 \langle A x_t, g(x_t) \rangle + \beta^2 \|x_t\|^4 - \|x_t\|^2
+\]
+
+We can further simplify this expression. Note that \(\langle A x_t, g(x_t) \rangle \leq \|A x_t\| \cdot \|g(x_t)\| \leq \|A x_t\| \cdot \beta \|x_t\|^2\). 
+
+Substitute this into the expression:
+
+\[
+V(x_{t+1}) - V(x_t) \leq \rho(A)^2 \|x_t\|^2 + 2 \|A x_t\| \cdot \beta \|x_t\|^3 + \beta^2 \|x_t\|^4 - \|x_t\|^2
+\]
+
+As \(\rho(A)^2 < 1\) and \(\|A x_t\| < \|x_t\), we have:
+
+\[
+V(x_{t+1}) - V(x_t) < \|x_t\|^2 (1 - \beta^2) + 2 \beta \|x_t\|^3 - \|x_t\|^2
+\]
+
+Since \(\|x_t\|^2\) is common, we can factor it out:
+
+\[
+V(x_{t+1}) - V(x_t) < \|x_t\|^2 \left(1 - \beta^2 + 2 \beta \|x_t\| - 1\right)
+\]
+
+Now, use the fact that \(\|x_t\| \leq 1\):
+
+\[
+V(x_{t+1}) - V(x_t) < \|x_t\|^2 \left(2 \beta \|x_t\| - \beta^2\right)
+\]
+
+Since \(\|x_t\| \leq 1\), we have:
+
+\[
+V(x_{t+1}) - V(x_t) < 2 \beta - \beta^2
+\]
+
+Now, choose \(\beta\) such that \(0 < \beta < 2\). In this case, \(\beta^2 < 2 \beta\), and we have:
+
+\[
+V(x_{t+1}) - V(x_t) < 0
+\]
+
+This implies that \(V(x_t)\) is a decreasing sequence, and hence, the origin is a locally exponentially stable equilibrium point for the given system.
+
+
+
+\end{document}

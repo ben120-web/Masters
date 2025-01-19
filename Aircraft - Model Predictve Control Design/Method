@@ -1,0 +1,102 @@
+To solve this Model Predictive Control (MPC) problem for the pitch control of an aircraft using Python, we need to follow several steps. These include formulating the MPC optimization problem, defining the system dynamics and constraints, setting up the quadratic programming problem, and finally, solving it using `qpsolvers`.
+
+### 1. MPC Formulation:
+
+- **Objective**: To design an MPC that drives the state (angle of attack \( \alpha \), pitch rate \( q \), and pitch angle \( \theta \)) to the origin while respecting the constraints.
+
+### 2. System Dynamics:
+
+Given by the equation:
+
+\[
+\begin{bmatrix}
+\alpha_{t+1} \\
+q_{t+1} \\
+\theta_{t+1}
+\end{bmatrix}
+=
+\begin{bmatrix}
+0.9835 & 2.782 & 0 \\
+-0.0006821 & 0.978 & 0 \\
+-0.0009730 & 2.804 & 1
+\end{bmatrix}
+\begin{bmatrix}
+\alpha_{t} \\
+q_{t} \\
+\theta_{t}
+\end{bmatrix}
++
+\begin{bmatrix}
+0.01293 \\
+0.00100 \\
+0.001425
+\end{bmatrix}
+\delta_{t}
+\]
+
+### 3. Constraints:
+
+1. \( |\alpha| \leq 11.5^\circ \)
+2. \( -24^\circ \leq \delta \leq 27^\circ \)
+3. \( |\theta| \leq 35^\circ \)
+4. \( |q| \leq 14 \text{ deg/s} \)
+5. \( |\theta - \alpha| \leq 23^\circ \)
+
+### 4. Setting Up the Quadratic Programming Problem:
+
+Using the standard form:
+
+\[
+\min_{x \in \mathbb{R}^n} \frac{1}{2} x^T P x + q^T x
+\]
+
+Subject to:
+
+\[
+Gx \leq h, \quad Ax = b, \quad x_{\text{min}} \leq x \leq x_{\text{max}}
+\]
+
+### 5. Solving the Problem with `qpsolvers`:
+
+I will provide a Python script outline. Please note, the exact formulation of matrices \( P \), \( q \), \( G \), \( h \), \( A \), \( b \), \( x_{\text{min}} \), and \( x_{\text{max}} \) requires detailed system and constraint analysis which can be quite complex.
+
+### Python Script Outline:
+
+```python
+import numpy as np
+from qpsolvers import solve_qp
+
+# Define your matrices based on the system dynamics and constraints
+P = ...  # Define the matrix P
+q = ...  # Define the vector q
+G = ...  # Define the matrix G for inequalities
+h = ...  # Define the vector h for inequalities
+A = ...  # Define the matrix A for equalities (if any)
+b = ...  # Define the vector b for equalities (if any)
+x_min = ...  # Lower bounds on x
+x_max = ...  # Upper bounds on x
+
+# Solve the quadratic programming problem
+x_opt = solve_qp(P, q, G, h, A, b, x_min, x_max)
+
+print("Optimal solution:", x_opt)
+```
+
+### Key Points to Consider:
+
+1. **Matrix Calculation**: You need to compute the matrices \( P \), \( q \), \( G \), \( h \), \( A \), \( b \), \( x_{\text{min}} \), and \( x_{\text{max}} \) based on your system dynamics, cost function, and constraints. This involves linearizing constraints and setting up the cost function in a quadratic form.
+
+2. **Constraints Linearization**: Convert constraints like \( |\alpha| \leq 11.5^\circ \) to a linear form suitable for QP.
+
+3. **Prediction Horizon**: Decide on a suitable prediction horizon \( N \) for your MPC. The horizon affects the size and complexity of the optimization problem.
+
+4. **Maximal Invariant Set**: You might need to compute the maximal invariant set using the `polytope` module in Python, as described in your handout, to ensure stability and feasibility of the MPC.
+
+5. **Simulations and Testing**: After solving the optimization problem, you'll need to simulate the system to ensure that the MPC controller behaves as expected and meets the constraints under various initial conditions.
+
+
+6. **Optimization Problem Complexity**: The complexity of solving the QP problem depends on the size of your matrices and the number of constraints. It's important to keep this in mind, especially if real-time control is a consideration.
+
+This
+
+ outline and script provide a framework to start solving your MPC problem using Python. You will need to fill in the specific details based on your system's requirements and constraints.
