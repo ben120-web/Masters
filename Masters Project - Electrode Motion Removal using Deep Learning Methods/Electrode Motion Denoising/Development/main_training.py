@@ -265,10 +265,10 @@ def main():
                     running_loss += loss.item()
 
             print(f'Epoch [{epoch + 1}/10], Loss: {running_loss / len(dataloader)}')
-        torch.save(net.state_dict(), './model_weightsDRNN6dB.pt')
+        torch.save(net.state_dict(), './model_weightsRCNN12dB.pt')
 
     else:
-        net.load_state_dict(torch.load('./model_weightsRCNN0dB.pt'))
+        net.load_state_dict(torch.load('./model_weightsRCNN12dB.pt'))
         net.eval()
 
     # Initialise.
