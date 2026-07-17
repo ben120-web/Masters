@@ -18,6 +18,8 @@ build and container build on every change. The `v1.0.0` tag creates a GitHub
 release with Python artifacts and publishes the same versioned container to
 `ghcr.io/ben120-web/ecg-motion-denoising`. Container publication is gated on
 package validation, and ordinary branch pushes cannot publish release artifacts.
+The registry release currently targets `linux/amd64`; ARM users can build the
+same Dockerfile natively from source.
 
 ## Version 1.0.0
 

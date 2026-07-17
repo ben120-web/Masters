@@ -30,6 +30,15 @@ docker run --rm -p 8000:8000 \
 The container health check uses liveness. An orchestrator should use readiness
 to keep an instance out of service until its model is valid.
 
+The tagged registry image currently targets `linux/amd64`:
+
+```bash
+docker pull ghcr.io/ben120-web/ecg-motion-denoising:1.0.0
+```
+
+On an ARM development machine, build the Dockerfile locally for a native image
+or run the registry image through explicit amd64 emulation.
+
 ## Release and rollback
 
 Semantic version tags build Python artifacts and a GHCR image. Treat the image
