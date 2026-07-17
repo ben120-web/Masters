@@ -1,0 +1,27 @@
+project:
+  name: ecg-motion-denoising-quick
+  seed: 42
+data:
+  sampling_rate_hz: 250
+  segment_seconds: 2
+  subjects: 8
+  segments_per_subject: 3
+  snr_db: [0, 12, 24]
+  train_fraction: 0.625
+  validation_fraction: 0.125
+model:
+  channels: 8
+  blocks: 2
+  kernel_size: 9
+training:
+  epochs: 1
+  batch_size: 4
+  learning_rate: 0.001
+  weight_decay: 0.0001
+  num_workers: 0
+  device: cpu
+  early_stopping_patience: 1
+tracking:
+  experiment_name: ecg-denoising-smoke
+  mlflow_tracking_uri: ./mlruns
+  tensorboard_dir: logs/tensorboard

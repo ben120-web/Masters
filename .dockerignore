@@ -1,0 +1,14 @@
+.git
+.dvc/cache
+.venv
+__pycache__
+coursework
+legacy
+mlruns
+logs
+data
+models
+reports
+*.pdf
+*.docx
+*.pptx

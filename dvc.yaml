@@ -1,0 +1,49 @@
+stages:
+  prepare:
+    cmd: PYTHONPATH=src python -m ecg_denoising.cli prepare --config params.yaml
+    deps:
+      - src/ecg_denoising/config.py
+      - src/ecg_denoising/data.py
+      - params.yaml
+    params:
+      - project.seed
+      - data
+    outs:
+      - data/processed/dataset.npz
+
+  train:
+    cmd: PYTHONPATH=src python -m ecg_denoising.cli train --config params.yaml
+    deps:
+      - data/processed/dataset.npz
+      - src/ecg_denoising/models.py
+      - src/ecg_denoising/train.py
+      - src/ecg_denoising/tracking.py
+      - params.yaml
+    params:
+      - project
+      - model
+      - training
+      - tracking
+    outs:
+      - models/model.pt
+    metrics:
+      - reports/training_summary.json:
+          cache: false
+
+  evaluate:
+    cmd: PYTHONPATH=src python -m ecg_denoising.cli evaluate --config params.yaml
+    deps:
+      - data/processed/dataset.npz
+      - models/model.pt
+      - src/ecg_denoising/evaluate.py
+      - src/ecg_denoising/metrics.py
+      - params.yaml
+    outs:
+      - reports/predictions.npz
+    metrics:
+      - reports/metrics.json:
+          cache: false
+    plots:
+      - reports/metrics.csv:
+          x: input_snr_db
+          y: snr_improvement_db

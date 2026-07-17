@@ -1,0 +1,21 @@
+name: ecg-motion-denoising
+
+python_env: python_env.yaml
+
+entry_points:
+  prepare:
+    parameters:
+      config: {type: path, default: params.yaml}
+    command: "python -m ecg_denoising.cli prepare --config {config}"
+  train:
+    parameters:
+      config: {type: path, default: params.yaml}
+    command: "python -m ecg_denoising.cli train --config {config}"
+  evaluate:
+    parameters:
+      config: {type: path, default: params.yaml}
+    command: "python -m ecg_denoising.cli evaluate --config {config}"
+  pipeline:
+    parameters:
+      config: {type: path, default: params.yaml}
+    command: "python -m ecg_denoising.cli pipeline --config {config}"
