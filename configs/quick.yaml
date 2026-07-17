@@ -23,5 +23,5 @@ training:
   early_stopping_patience: 1
 tracking:
   experiment_name: ecg-denoising-smoke
-  mlflow_tracking_uri: ./mlruns
+  mlflow_tracking_uri: sqlite:///mlflow.db
   tensorboard_dir: logs/tensorboard

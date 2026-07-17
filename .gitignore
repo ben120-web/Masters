@@ -15,6 +15,7 @@ build/
 
 # Experiment/runtime state
 mlruns/
+mlflow.db*
 logs/
 outputs/
 

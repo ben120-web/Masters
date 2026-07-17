@@ -27,5 +27,5 @@ training:
 
 tracking:
   experiment_name: ecg-denoising
-  mlflow_tracking_uri: ./mlruns
+  mlflow_tracking_uri: sqlite:///mlflow.db
   tensorboard_dir: logs/tensorboard

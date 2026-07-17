@@ -41,7 +41,7 @@ dvc repro
 
 # Inspect results and experiments.
 dvc metrics show
-mlflow ui --backend-store-uri ./mlruns
+mlflow ui --backend-store-uri sqlite:///mlflow.db
 tensorboard --logdir logs/tensorboard
 ```
 

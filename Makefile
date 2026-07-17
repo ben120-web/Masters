@@ -16,7 +16,7 @@ quality:
 	mypy src/ecg_denoising
 
 serve-mlflow:
-	mlflow ui --backend-store-uri ./mlruns
+	mlflow ui --backend-store-uri sqlite:///mlflow.db
 
 tensorboard:
 	tensorboard --logdir logs/tensorboard

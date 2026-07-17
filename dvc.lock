@@ -5,8 +5,8 @@ stages:
     deps:
     - path: params.yaml
       hash: md5
-      md5: 1ea6348df6d31b60e3e43df770636957
-      size: 533
+      md5: 50e66140706f4726c6361dd11e7b8449
+      size: 544
     - path: src/ecg_denoising/config.py
       hash: md5
       md5: 36ab0ee7a557f52cfb71e455455461a9
@@ -45,8 +45,8 @@ stages:
       size: 2190528
     - path: params.yaml
       hash: md5
-      md5: 1ea6348df6d31b60e3e43df770636957
-      size: 533
+      md5: 50e66140706f4726c6361dd11e7b8449
+      size: 544
     - path: src/ecg_denoising/models.py
       hash: md5
       md5: e10588d7470a310e62bc2a025d11d56c
@@ -70,7 +70,7 @@ stages:
           seed: 42
         tracking:
           experiment_name: ecg-denoising
-          mlflow_tracking_uri: ./mlruns
+          mlflow_tracking_uri: sqlite:///mlflow.db
           tensorboard_dir: logs/tensorboard
         training:
           epochs: 8
@@ -102,8 +102,8 @@ stages:
       size: 314570
     - path: params.yaml
       hash: md5
-      md5: 1ea6348df6d31b60e3e43df770636957
-      size: 533
+      md5: 50e66140706f4726c6361dd11e7b8449
+      size: 544
     - path: src/ecg_denoising/evaluate.py
       hash: md5
       md5: 930145997ae73887942a66205c038b31
