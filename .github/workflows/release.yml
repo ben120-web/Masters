@@ -52,7 +52,7 @@ jobs:
       - id: metadata
         uses: docker/metadata-action@v6
         with:
-          images: ghcr.io/${{ github.repository }}
+          images: ghcr.io/ben120-web/ecg-motion-denoising
           tags: |
             type=semver,pattern={{version}}
             type=semver,pattern={{major}}.{{minor}}

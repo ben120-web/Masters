@@ -16,8 +16,8 @@ reproducible experiments, automated validation and deployable model artifacts.
 CI runs linting, typing, tests, a complete quick-pipeline smoke test, package
 build and container build on every change. The `v1.0.0` tag creates a GitHub
 release with Python artifacts and publishes the same versioned container to
-GitHub Container Registry. Container publication is gated on package validation,
-and ordinary branch pushes cannot publish release artifacts.
+`ghcr.io/ben120-web/ecg-motion-denoising`. Container publication is gated on
+package validation, and ordinary branch pushes cannot publish release artifacts.
 
 ## Version 1.0.0
 
