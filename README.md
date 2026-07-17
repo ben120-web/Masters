@@ -14,10 +14,19 @@ reproducible experiments, automated validation and deployable model artifacts.
 > for diagnosis or clinical decision-making.
 
 CI runs linting, typing, tests, a complete quick-pipeline smoke test, package
-build and container build on every change. Pushing a semantic version tag such
-as `v0.2.0` creates a GitHub release with Python artifacts and publishes the
-same versioned container to GitHub Container Registry. Releases are deliberately
-tag-driven so an ordinary branch push can never publish an artifact.
+build and container build on every change. The `v1.0.0` tag creates a GitHub
+release with Python artifacts and publishes the same versioned container to
+GitHub Container Registry. Container publication is gated on package validation,
+and ordinary branch pushes cannot publish release artifacts.
+
+## Version 1.0.0
+
+This stable engineering baseline covers the complete path from deterministic
+data preparation and lineage through training, evaluation, model governance,
+typed online inference, telemetry and container delivery. The release gate
+includes 17 tests, Ruff, strict mypy, package construction, a full quick-pipeline
+run, container construction and CodeQL. It versions the software system—not a
+clinically approved model—and requires a compatible checkpoint at runtime.
 
 ## What this demonstrates
 

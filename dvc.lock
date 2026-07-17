@@ -51,6 +51,10 @@ stages:
       hash: md5
       md5: 4e8977aca8b2f4aae8b32d6f04616e6d
       size: 634
+    - path: src/ecg_denoising/__init__.py
+      hash: md5
+      md5: 5d17e40f6ede2b8b98f5f90ddfe66559
+      size: 68
     - path: src/ecg_denoising/models.py
       hash: md5
       md5: e10588d7470a310e62bc2a025d11d56c
@@ -87,7 +91,7 @@ stages:
     outs:
     - path: models/model.pt
       hash: md5
-      md5: af649f28b1756fe45242455c2aa0fad9
+      md5: ed2fe4bfa29975a35cce77c17bcac6ae
       size: 314698
     - path: reports/training_summary.json
       hash: md5
@@ -102,7 +106,7 @@ stages:
       size: 2190528
     - path: models/model.pt
       hash: md5
-      md5: af649f28b1756fe45242455c2aa0fad9
+      md5: ed2fe4bfa29975a35cce77c17bcac6ae
       size: 314698
     - path: params.yaml
       hash: md5
