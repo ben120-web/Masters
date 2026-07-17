@@ -25,3 +25,6 @@ tracking:
   experiment_name: ecg-denoising-smoke
   mlflow_tracking_uri: sqlite:///mlflow.db
   tensorboard_dir: logs/tensorboard
+promotion:
+  minimum_mean_snr_improvement_db: 0.0
+  minimum_worst_snr_improvement_db: -10.0

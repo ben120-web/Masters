@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import math
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Any
@@ -56,12 +57,27 @@ class TrackingConfig:
 
 
 @dataclass(frozen=True)
+class PromotionConfig:
+    minimum_mean_snr_improvement_db: float
+    minimum_worst_snr_improvement_db: float
+
+
+@dataclass(frozen=True)
 class Config:
     project: ProjectConfig
     data: DataConfig
     model: ModelConfig
     training: TrainingConfig
     tracking: TrackingConfig
+    promotion: PromotionConfig
+
+
+def grouped_split_counts(data: DataConfig) -> tuple[int, int, int]:
+    """Return deterministic subject counts for train, validation and test splits."""
+    train_subjects = round(data.subjects * data.train_fraction)
+    validation_subjects = round(data.subjects * data.validation_fraction)
+    test_subjects = data.subjects - train_subjects - validation_subjects
+    return train_subjects, validation_subjects, test_subjects
 
 
 def _require(mapping: dict[str, Any], key: str) -> dict[str, Any]:
@@ -84,6 +100,7 @@ def load_config(path: str | Path) -> Config:
     model = ModelConfig(**_require(raw, "model"))
     training = TrainingConfig(**_require(raw, "training"))
     tracking = TrackingConfig(**_require(raw, "tracking"))
+    promotion = PromotionConfig(**_require(raw, "promotion"))
 
     if data.subjects < 3:
         raise ValueError("At least three subjects are required for grouped splits")
@@ -91,6 +108,26 @@ def load_config(path: str | Path) -> Config:
         raise ValueError("Split fractions must be between zero and one")
     if data.train_fraction + data.validation_fraction >= 1:
         raise ValueError("A non-empty test split is required")
+    split_counts = grouped_split_counts(data)
+    if any(count < 1 for count in split_counts):
+        raise ValueError(
+            "Grouped split fractions must allocate at least one subject to train, "
+            "validation and test"
+        )
+    if data.sampling_rate_hz < 1 or data.segment_seconds < 1:
+        raise ValueError("sampling_rate_hz and segment_seconds must be positive")
+    if data.segments_per_subject < 1 or not data.snr_db:
+        raise ValueError("segments_per_subject and snr_db must be non-empty")
+    if model.channels < 1 or model.blocks < 1 or model.kernel_size < 1:
+        raise ValueError("Model dimensions must be positive")
     if model.kernel_size % 2 == 0:
         raise ValueError("kernel_size must be odd to preserve signal length")
-    return Config(project, data, model, training, tracking)
+    if not all(
+        math.isfinite(value)
+        for value in (
+            promotion.minimum_mean_snr_improvement_db,
+            promotion.minimum_worst_snr_improvement_db,
+        )
+    ):
+        raise ValueError("Promotion thresholds must be finite")
+    return Config(project, data, model, training, tracking, promotion)

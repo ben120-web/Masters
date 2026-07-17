@@ -12,6 +12,7 @@ import torch
 from torch import nn
 from torch.utils.data import DataLoader, TensorDataset
 
+from . import __version__
 from .config import Config
 from .data import load_split
 from .models import build_model
@@ -29,7 +30,7 @@ def resolve_device(requested: str) -> torch.device:
 
 
 def _loader(path: Path, split: int, config: Config, shuffle: bool) -> DataLoader:
-    noisy, clean, _ = load_split(path, split)
+    noisy, clean, _ = load_split(path, split, config.data)
     dataset = TensorDataset(torch.from_numpy(noisy), torch.from_numpy(clean))
     generator = torch.Generator().manual_seed(config.project.seed)
     return DataLoader(
@@ -43,12 +44,22 @@ def _loader(path: Path, split: int, config: Config, shuffle: bool) -> DataLoader
 
 def _mean_loss(model: nn.Module, loader: DataLoader, device: torch.device) -> float:
     model.eval()
-    losses: list[float] = []
+    squared_error = 0.0
+    elements = 0
     with torch.no_grad():
         for noisy, clean in loader:
             prediction = model(noisy.float().to(device))
-            losses.append(nn.functional.mse_loss(prediction, clean.float().to(device)).item())
-    return float(np.mean(losses))
+            target = clean.float().to(device)
+            squared_error += nn.functional.mse_loss(prediction, target, reduction="sum").item()
+            elements += target.numel()
+    if elements == 0:
+        raise ValueError("Cannot calculate loss for an empty data loader")
+    return squared_error / elements
+
+
+def _clone_state_dict(model: nn.Module) -> dict[str, torch.Tensor]:
+    """Snapshot model state without retaining shared CPU storage."""
+    return {key: value.detach().cpu().clone() for key, value in model.state_dict().items()}
 
 
 def train_model(
@@ -88,7 +99,8 @@ def train_model(
         tracker.log_params(flat_params)
         for epoch in range(config.training.epochs):
             model.train()
-            batch_losses: list[float] = []
+            train_squared_error = 0.0
+            train_elements = 0
             for noisy, clean in train_loader:
                 noisy = noisy.float().to(device)
                 clean = clean.float().to(device)
@@ -98,9 +110,12 @@ def train_model(
                 loss.backward()
                 nn.utils.clip_grad_norm_(model.parameters(), max_norm=1.0)
                 optimizer.step()
-                batch_losses.append(loss.item())
+                train_squared_error += loss.item() * clean.numel()
+                train_elements += clean.numel()
 
-            train_loss = float(np.mean(batch_losses))
+            if train_elements == 0:
+                raise ValueError("Training split is empty")
+            train_loss = train_squared_error / train_elements
             validation_loss = _mean_loss(model, validation_loader, device)
             epochs_completed = epoch + 1
             tensorboard.scalar("loss/train", train_loss, epoch)
@@ -110,9 +125,7 @@ def train_model(
             )
             if validation_loss < best_loss:
                 best_loss = validation_loss
-                best_state = {
-                    key: value.detach().cpu() for key, value in model.state_dict().items()
-                }
+                best_state = _clone_state_dict(model)
                 patience = 0
             else:
                 patience += 1
@@ -129,6 +142,8 @@ def train_model(
                 "model_state": best_state,
                 "model_config": asdict(config.model),
                 "data_config": asdict(config.data),
+                "checkpoint_format_version": 1,
+                "package_version": __version__,
                 "seed": config.project.seed,
             },
             output,

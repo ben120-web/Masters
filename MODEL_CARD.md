@@ -27,8 +27,11 @@ are recorded with each checkpoint.
 ## Evaluation
 
 The pipeline reports RMSE, normalised correlation coefficient and SNR
-improvement on a subject-held-out test split. Generated values live in
-`reports/metrics.json`; no benchmark value is claimed in source documentation.
+improvement on a subject-held-out test split. The versioned
+[reference run](reports/reference/README.md) records +0.970 dB mean SNR
+improvement, but -4.483 dB in the cleanest synthetic stratum. It is correctly
+marked **rejected** by the worst-case promotion check. This generated-data run
+validates software behaviour only; it is not a clinical benchmark.
 
 ## Limitations
 

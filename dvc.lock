@@ -5,16 +5,16 @@ stages:
     deps:
     - path: params.yaml
       hash: md5
-      md5: 50e66140706f4726c6361dd11e7b8449
-      size: 544
+      md5: 4e8977aca8b2f4aae8b32d6f04616e6d
+      size: 634
     - path: src/ecg_denoising/config.py
       hash: md5
-      md5: 36ab0ee7a557f52cfb71e455455461a9
-      size: 2635
+      md5: 5e9411a63243e097dfbdfd5ec51096d7
+      size: 4237
     - path: src/ecg_denoising/data.py
       hash: md5
-      md5: 6356ac0aa2b7c532b53494f11e4b5379
-      size: 5105
+      md5: fa185d088e4300dcbbb66aceb857a97e
+      size: 8871
     params:
       params.yaml:
         data:
@@ -36,6 +36,10 @@ stages:
       hash: md5
       md5: d0d9325b98e89443babfc70b74e192b0
       size: 2190528
+    - path: reports/data_manifest.json
+      hash: md5
+      md5: 26e072eed94776c9f169ac086c8ab2f3
+      size: 560
   train:
     cmd: PYTHONPATH=src python -m ecg_denoising.cli train --config params.yaml
     deps:
@@ -45,8 +49,8 @@ stages:
       size: 2190528
     - path: params.yaml
       hash: md5
-      md5: 50e66140706f4726c6361dd11e7b8449
-      size: 544
+      md5: 4e8977aca8b2f4aae8b32d6f04616e6d
+      size: 634
     - path: src/ecg_denoising/models.py
       hash: md5
       md5: e10588d7470a310e62bc2a025d11d56c
@@ -57,8 +61,8 @@ stages:
       size: 1991
     - path: src/ecg_denoising/train.py
       hash: md5
-      md5: 3b29f36ea2ab363923f27a3b7d432f54
-      size: 5492
+      md5: efe33d68ce5375340f62f635eedce813
+      size: 6165
     params:
       params.yaml:
         model:
@@ -78,16 +82,16 @@ stages:
           learning_rate: 0.001
           weight_decay: 0.0001
           num_workers: 0
-          device: auto
+          device: cpu
           early_stopping_patience: 3
     outs:
     - path: models/model.pt
       hash: md5
-      md5: 6e7716fb26f8da86be045cf635989636
-      size: 314570
+      md5: af649f28b1756fe45242455c2aa0fad9
+      size: 314698
     - path: reports/training_summary.json
       hash: md5
-      md5: 7500db99bf15876db4eba716bae058b1
+      md5: 1c912f9f10f22d37b11bc0af05942823
       size: 96
   evaluate:
     cmd: PYTHONPATH=src python -m ecg_denoising.cli evaluate --config params.yaml
@@ -98,16 +102,20 @@ stages:
       size: 2190528
     - path: models/model.pt
       hash: md5
-      md5: 6e7716fb26f8da86be045cf635989636
-      size: 314570
+      md5: af649f28b1756fe45242455c2aa0fad9
+      size: 314698
     - path: params.yaml
       hash: md5
-      md5: 50e66140706f4726c6361dd11e7b8449
-      size: 544
+      md5: 4e8977aca8b2f4aae8b32d6f04616e6d
+      size: 634
     - path: src/ecg_denoising/evaluate.py
       hash: md5
-      md5: 930145997ae73887942a66205c038b31
-      size: 2273
+      md5: bf12cf4d62d5f6f875cf385bc0d61cd9
+      size: 2153
+    - path: src/ecg_denoising/governance.py
+      hash: md5
+      md5: 769d767890825d594d03de3363250290
+      size: 1546
     - path: src/ecg_denoising/metrics.py
       hash: md5
       md5: 3f6a3af4475b2bc7cd329427b6cc0fb6
@@ -115,13 +123,17 @@ stages:
     outs:
     - path: reports/metrics.csv
       hash: md5
-      md5: 035057f86747dba8775b4c34f567b529
-      size: 158
+      md5: 103e286f3859c16e555ad7b0f5bc6c1b
+      size: 155
     - path: reports/metrics.json
       hash: md5
-      md5: 3e7e44b15cb6f58478efd300d6933f58
-      size: 201
+      md5: e2c052e58538d2fe89c479450d85cf15
+      size: 199
     - path: reports/predictions.npz
       hash: md5
-      md5: e34d32a2763605a0004c386516314111
-      size: 545108
+      md5: ef44a1f6e344519da4edd47b77630721
+      size: 545165
+    - path: reports/promotion.json
+      hash: md5
+      md5: e27e5e86a55eb95e9ba155589a1ddc4c
+      size: 489

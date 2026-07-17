@@ -22,10 +22,14 @@ training:
   learning_rate: 0.001
   weight_decay: 0.0001
   num_workers: 0
-  device: auto
+  device: cpu
   early_stopping_patience: 3
 
 tracking:
   experiment_name: ecg-denoising
   mlflow_tracking_uri: sqlite:///mlflow.db
   tensorboard_dir: logs/tensorboard
+
+promotion:
+  minimum_mean_snr_improvement_db: 0.5
+  minimum_worst_snr_improvement_db: 0.0

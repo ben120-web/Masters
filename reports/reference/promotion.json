@@ -1,0 +1,22 @@
+{
+  "schema_version": 1,
+  "decision": "rejected",
+  "checks": [
+    {
+      "name": "mean_snr_improvement_db",
+      "value": 0.9698680695083883,
+      "operator": ">=",
+      "threshold": 0.5,
+      "passed": true
+    },
+    {
+      "name": "worst_case_snr_improvement_db",
+      "value": -4.48287183827453,
+      "operator": ">=",
+      "threshold": 0.0,
+      "passed": false
+    }
+  ],
+  "scope": "synthetic software-validation dataset only",
+  "clinical_release_authorized": false
+}

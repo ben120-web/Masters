@@ -32,3 +32,5 @@ outputs/
 ~$*
 *.tmp
 *.asv
+*.pdf
+*.synctex*

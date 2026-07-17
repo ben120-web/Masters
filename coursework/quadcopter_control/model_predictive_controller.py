@@ -1,124 +1,124 @@
-## This module contains a model predictive controller specific to a quadcopter system.
+"""Finite-horizon linear model-predictive control.
+
+The controller solves the unconstrained quadratic tracking problem
+
+    min_U (R - O x - M U)^T Q (R - O x - M U) + U^T R_u U
+
+for a discrete-time linear system. It is retained as a compact, executable
+example of the lifted-matrix MPC formulation used in the MSc control work.
+"""
+
+from __future__ import annotations
+
 import numpy as np
+from numpy.typing import NDArray
 
-# Define the controller.
+FloatArray = NDArray[np.float64]
+
+
 class ModelPredictiveControl:
-    
-    # Intialisation function. Initialised the state matricies, etc.
-    def __init__(self, A, B, C, f, v, W3, W4, x0, desired_control_trajectory_total):
-        self.A = A # State transition matrix.
-        self.B = B # Control Input matrix.
-        self.C = C # Maps the systems state to its outout (Observables)
-        self.f = f # Prediction Horizon
-        self.v = v # Control horizon
-        self.W3 = # Weight matrix, define how deviations from the desired trajectory are penalized
-        self.W4 = W4 # Weight matrix
-        self.desired_control_trajectory_total = desired_control_trajectory_total # Control objectives over time.
-        self.n = A.shape[0]
-        self.r = C.shape[0]
-        self.m = B.shape[1]
-        self.currentTimeStep = 0
-        self.states = [x0]
-        self.outputs = []
-        self.inputs = []
-        self.O, self.M, self.gainMatrix = self.formLiftedMatrices()
+    """Unconstrained linear MPC with a receding control horizon."""
 
-    # This function creates 'lifted' matricies O and M whicgh are used in the MPC optimisation. 
-    def formLiftedMatrices(self):
-        f = self.f
-        v = self.v
-        r = self.r
-        n = self.n
-        m = self.m
-        A = self.A
-        B = self.B
-        C = self.C
+    def __init__(
+        self,
+        state_matrix: FloatArray,
+        input_matrix: FloatArray,
+        output_matrix: FloatArray,
+        prediction_horizon: int,
+        control_horizon: int,
+        control_weight: FloatArray,
+        output_weight: FloatArray,
+    ) -> None:
+        self.a = np.asarray(state_matrix, dtype=np.float64)
+        self.b = np.asarray(input_matrix, dtype=np.float64)
+        self.c = np.asarray(output_matrix, dtype=np.float64)
+        self.prediction_horizon = prediction_horizon
+        self.control_horizon = control_horizon
+        self._validate_dimensions(control_weight, output_weight)
+        self.control_weight = np.asarray(control_weight, dtype=np.float64)
+        self.output_weight = np.asarray(output_weight, dtype=np.float64)
+        self.observability, self.control_map = self._lifted_matrices()
+        hessian = self.control_map.T @ self.output_weight @ self.control_map
+        hessian += self.control_weight
+        right_hand_side = self.control_map.T @ self.output_weight
+        # solve() is more stable than explicitly forming the matrix inverse.
+        self.gain = np.linalg.solve(hessian, right_hand_side)
 
-        # Set O, this is the systems output for future steps based on the current state.
-        O = np.zeros((f * r, n))
-        
-        # Loop through the prediction horizon.
-        for i in range(f):
-            
-            # If the first element in the horizon is being processed, set the power of A as A.
-            if i == 0:
-                powA = A
-            else:
-                
-                # Calculate the power of A (A^2, A^3...)
-                powA = np.linalg.matrix_power(A, i)
-            
-            # Update the predicted output matrix    
-            O[i * r : (i + 1) * r, :] = np.dot(C, powA)
+    @property
+    def state_size(self) -> int:
+        return self.a.shape[0]
 
-        # Initialise the M matrix.
-        M = np.zeros((f * r, v * m))
-        
-        # Loop through the prediction horsizon.
-        for i in range(f):
-            
-            # Loop through the control horizon.
-            for j in range(min(v, i + 1)):
-                
-                # If it is the 1st element, set as I.
-                if j == 0:
-                    powA = np.eye(n)
-                else:
-                    
-                    # Calculate the matrix power for each iteration.
-                    powA = np.linalg.matrix_power(A, j)
-                    
-                # Update the M matrix.
-                M[i * r : (i + 1) * r, (i - j) * m :(i - j + 1) * m] = np.dot(C, np.dot(powA, B))
+    @property
+    def input_size(self) -> int:
+        return self.b.shape[1]
 
-        # Compute the gaim matrix.
-        tmp1 = np.dot(M.T, np.dot(self.W4, M))
-        tmp2 = np.linalg.inv(tmp1 + self.W3)
-        gainMatrix = np.dot(tmp2, np.dot(M.T, self.W4))
+    @property
+    def output_size(self) -> int:
+        return self.c.shape[0]
 
-        return O, M, gainMatrix
+    def _validate_dimensions(
+        self, control_weight: FloatArray, output_weight: FloatArray
+    ) -> None:
+        if self.prediction_horizon < 1 or self.control_horizon < 1:
+            raise ValueError("MPC horizons must be positive")
+        if self.control_horizon > self.prediction_horizon:
+            raise ValueError("control_horizon cannot exceed prediction_horizon")
+        if self.a.ndim != 2 or self.a.shape[0] != self.a.shape[1]:
+            raise ValueError("state_matrix must be square")
+        if self.b.shape[0] != self.a.shape[0]:
+            raise ValueError("input_matrix row count must match the state size")
+        if self.c.shape[1] != self.a.shape[0]:
+            raise ValueError("output_matrix column count must match the state size")
+        expected_control = self.control_horizon * self.b.shape[1]
+        expected_output = self.prediction_horizon * self.c.shape[0]
+        if np.shape(control_weight) != (expected_control, expected_control):
+            raise ValueError("control_weight has the wrong shape")
+        if np.shape(output_weight) != (expected_output, expected_output):
+            raise ValueError("output_weight has the wrong shape")
 
-    # This function simulates the next state of the system given the current state and control inpit.
-    def propagateDynamics(self, controlInput, state):
-        
-        
-        controlInput = controlInput[: self.B.shape[0]]  # Remove unnecessary indexing
-        
-        # Update the x state. (Ax + Bu)
-        xkp1 = np.dot(self.A, state) + np.dot(self.B, controlInput)
-        
-        # Update the outut state. (Cx)
-        yk = np.dot(self.C, state)
-        return xkp1, yk
-        
-    # Compute the required control inputs.
-    def computeControlInputs(self, estimated_state):
-        
-            # Get the desired control trajectroy for the current horizon.
-            desiredControlTrajectory = self.desired_control_trajectory_total[self.currentTimeStep : self.currentTimeStep + self.f]
-            desiredControlTrajectory = np.vstack((desiredControlTrajectory, np.zeros((self.f - len(desiredControlTrajectory), 1))))
+    def _lifted_matrices(self) -> tuple[FloatArray, FloatArray]:
+        observability = np.zeros(
+            (self.prediction_horizon * self.output_size, self.state_size)
+        )
+        control_map = np.zeros(
+            (
+                self.prediction_horizon * self.output_size,
+                self.control_horizon * self.input_size,
+            )
+        )
+        for prediction_step in range(self.prediction_horizon):
+            row = slice(
+                prediction_step * self.output_size,
+                (prediction_step + 1) * self.output_size,
+            )
+            observability[row] = self.c @ np.linalg.matrix_power(
+                self.a, prediction_step + 1
+            )
+            for control_step in range(min(prediction_step + 1, self.control_horizon)):
+                column = slice(
+                    control_step * self.input_size,
+                    (control_step + 1) * self.input_size,
+                )
+                power = prediction_step - control_step
+                control_map[row, column] = (
+                    self.c @ np.linalg.matrix_power(self.a, power) @ self.b
+                )
+        return observability, control_map
 
-            
-            vectorS = desiredControlTrajectory - np.dot(self.O, estimated_state)
+    def control_sequence(self, state: FloatArray, reference: FloatArray) -> FloatArray:
+        """Return the optimal open-loop sequence for the current state."""
+        state_vector = np.asarray(state, dtype=np.float64).reshape(self.state_size, 1)
+        reference_vector = np.asarray(reference, dtype=np.float64).reshape(
+            self.prediction_horizon * self.output_size, 1
+        )
+        tracking_error = reference_vector - self.observability @ state_vector
+        return self.gain @ tracking_error
 
-            # Calculate the deviation between estimated altitude and desired altitude
-            altitude_deviation = estimated_state[0] - desiredControlTrajectory[0]
+    def control(self, state: FloatArray, reference: FloatArray) -> FloatArray:
+        """Return the first receding-horizon input to apply to the plant."""
+        return self.control_sequence(state, reference)[: self.input_size]
 
-            # Adjust control inputs based on altitude deviation
-            if abs(altitude_deviation) > 2:
-                # If the deviation is greater than 2 meters, adjust the control input
-                sign = np.sign(altitude_deviation)
-                inputSequenceComputed = np.dot(self.gainMatrix, vectorS) - sign * 2  # Adjust control input
-            else:
-                inputSequenceComputed = np.dot(self.gainMatrix, vectorS)
-            
-            inputApplied = inputSequenceComputed[0]
-            
-            # Propagate dynamics using the computed control input
-            state_kp1, output_k = self.propagateDynamics(inputApplied, self.states[self.currentTimeStep])
-            
-            # Update states, outputs, and inputs
-            self.states.append(state_kp1)
-            self.outputs.append(output_k)
-            self.inputs.append(inputApplied)
-            self.currentTimeStep += 1
+    def propagate(self, state: FloatArray, control: FloatArray) -> FloatArray:
+        state_vector = np.asarray(state, dtype=np.float64).reshape(self.state_size, 1)
+        control_vector = np.asarray(control, dtype=np.float64).reshape(self.input_size, 1)
+        return self.a @ state_vector + self.b @ control_vector

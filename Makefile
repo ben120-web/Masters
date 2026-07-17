@@ -1,4 +1,4 @@
-.PHONY: install pipeline test quality clean serve-mlflow tensorboard
+.PHONY: install pipeline test quality clean serve-api serve-mlflow tensorboard
 
 install:
 	python -m pip install --upgrade pip
@@ -14,6 +14,9 @@ quality:
 	ruff check src tests
 	ruff format --check src tests
 	mypy src/ecg_denoising
+
+serve-api:
+	ecg-denoise serve --model-path models/model.pt
 
 serve-mlflow:
 	mlflow ui --backend-store-uri sqlite:///mlflow.db

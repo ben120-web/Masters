@@ -22,11 +22,15 @@ tag-driven so an ordinary branch push can never publish an artifact.
 ## What this demonstrates
 
 - Subject-grouped data splits to reduce identity and synthetic-source leakage.
+- A hashed data manifest with schema, lineage and split cardinalities.
 - A reproducible `prepare -> train -> evaluate` pipeline orchestrated by DVC.
 - MLflow experiment tracking and TensorBoard training diagnostics.
 - Configuration-driven PyTorch training with deterministic seeds.
 - Scientific metrics: RMSE, normalised correlation and SNR improvement.
-- Unit tests, linting, type checks, CI and a containerised runtime.
+- Explicit aggregate and worst-case promotion checks with a recorded decision.
+- A contract-validated FastAPI inference service with Prometheus metrics.
+- A tested lifted-matrix MPC implementation with derivation and complexity notes.
+- Unit tests, linting, type checks, CI and a non-root container runtime.
 
 ## Quick start
 
@@ -45,6 +49,19 @@ mlflow ui --backend-store-uri sqlite:///mlflow.db
 tensorboard --logdir logs/tensorboard
 ```
 
+Serve the trained checkpoint locally:
+
+```bash
+ecg-denoise serve --model-path models/model.pt
+curl http://127.0.0.1:8000/health/ready
+curl http://127.0.0.1:8000/metrics
+```
+
+The versioned `POST /v1/denoise` endpoint accepts exactly one signal window and
+its sampling rate. OpenAPI documentation is available at `/docs`. See the
+[operations guide](docs/operations.md) for container use and the service
+contract.
+
 The default configuration generates a small deterministic synthetic dataset so
 that the complete workflow can be exercised without access to private or large
 research data. To use a DVC remote, see [the data guide](docs/data.md).
@@ -62,6 +79,19 @@ Every training run records parameters, metrics and artifacts in local MLflow.
 TensorBoard records batch/epoch curves. DVC decides which pipeline stages need
 to be rerun and versions the resulting data/model artifacts independently of
 Git.
+
+## Reference result
+
+The reproducible default CPU run improves mean held-out synthetic SNR by
+**0.970 dB**, but reduces SNR by **4.483 dB** in the cleanest 24 dB stratum.
+The machine-readable promotion decision is therefore **rejected**. This is the
+intended governance behaviour: an aggregate gain does not conceal a harmful
+slice. See the [reference report](reports/reference/README.md), its
+[data manifest](reports/reference/data_manifest.json) and the
+[promotion record](reports/reference/promotion.json).
+
+These numbers validate the pipeline and expose the next modelling problem;
+they are not evidence of clinical efficacy.
 
 ## Repository layout
 
@@ -86,6 +116,7 @@ make install     # install development dependencies
 make pipeline    # run dvc repro
 make test        # unit tests
 make quality     # lint and type checks
+make serve-api
 make serve-mlflow
 make tensorboard
 ```
@@ -99,7 +130,11 @@ under `legacy/`; it is intentionally excluded from the maintained package.
 Historical MSc coursework is under `coursework/`.
 
 See [`MODEL_CARD.md`](MODEL_CARD.md) for intended use and limitations and
-[`docs/experiments.md`](docs/experiments.md) for the experiment protocol.
+[`docs/experiments.md`](docs/experiments.md) for the experiment protocol. System
+design and operational decisions are documented in
+[`docs/architecture.md`](docs/architecture.md),
+[`docs/algorithm.md`](docs/algorithm.md) and
+[`docs/operations.md`](docs/operations.md).
 
 ## Author
 

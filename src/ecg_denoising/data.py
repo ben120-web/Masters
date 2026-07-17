@@ -2,11 +2,17 @@
 
 from __future__ import annotations
 
+import hashlib
+import json
 from pathlib import Path
 
 import numpy as np
 
-from .config import Config
+from .config import Config, DataConfig, grouped_split_counts
+
+
+class DataContractError(ValueError):
+    """Raised when a stored dataset violates the training/inference contract."""
 
 
 def _gaussian(phase: np.ndarray, centre: float, width: float, amplitude: float) -> np.ndarray:
@@ -59,14 +65,9 @@ def add_at_snr(clean: np.ndarray, noise: np.ndarray, snr_db: float) -> np.ndarra
 
 def _subject_splits(config: Config, rng: np.random.Generator) -> dict[int, int]:
     subject_ids = rng.permutation(config.data.subjects)
-    train_end = max(1, round(config.data.subjects * config.data.train_fraction))
-    validation_end = max(
-        train_end + 1,
-        round(
-            config.data.subjects * (config.data.train_fraction + config.data.validation_fraction)
-        ),
-    )
-    validation_end = min(validation_end, config.data.subjects - 1)
+    train_subjects, validation_subjects, _ = grouped_split_counts(config.data)
+    train_end = train_subjects
+    validation_end = train_subjects + validation_subjects
     mapping: dict[int, int] = {}
     for subject in subject_ids[:train_end]:
         mapping[int(subject)] = 0
@@ -77,8 +78,20 @@ def _subject_splits(config: Config, rng: np.random.Generator) -> dict[int, int]:
     return mapping
 
 
-def prepare_dataset(config: Config, output_path: str | Path) -> Path:
-    """Create a deterministic smoke dataset while preventing subject leakage."""
+def _sha256(path: Path) -> str:
+    digest = hashlib.sha256()
+    with path.open("rb") as handle:
+        for chunk in iter(lambda: handle.read(1024 * 1024), b""):
+            digest.update(chunk)
+    return digest.hexdigest()
+
+
+def prepare_dataset(
+    config: Config,
+    output_path: str | Path,
+    manifest_path: str | Path | None = None,
+) -> Path:
+    """Create a deterministic smoke dataset and optional lineage manifest."""
     rng = np.random.default_rng(config.project.seed)
     split_by_subject = _subject_splits(config, rng)
     clean_rows: list[np.ndarray] = []
@@ -113,10 +126,88 @@ def prepare_dataset(config: Config, output_path: str | Path) -> Path:
         input_snr_db=np.asarray(snrs, dtype=np.float32),
         sampling_rate_hz=np.asarray(config.data.sampling_rate_hz),
     )
+    if manifest_path is not None:
+        split_values = np.asarray(splits, dtype=np.int8)
+        subject_values = np.asarray(subjects, dtype=np.int16)
+        split_names = {0: "train", 1: "validation", 2: "test"}
+        manifest = {
+            "schema_version": 1,
+            "dataset_sha256": _sha256(output),
+            "generator": "ecg_denoising.data.prepare_dataset",
+            "seed": config.project.seed,
+            "records": len(clean_rows),
+            "subjects": config.data.subjects,
+            "split_records": {
+                name: int(np.sum(split_values == split_id))
+                for split_id, name in split_names.items()
+            },
+            "split_subjects": {
+                name: int(np.unique(subject_values[split_values == split_id]).size)
+                for split_id, name in split_names.items()
+            },
+            "signal": {
+                "dtype": "float32",
+                "channels": 1,
+                "samples": config.data.samples,
+                "sampling_rate_hz": config.data.sampling_rate_hz,
+            },
+            "input_snr_db": sorted(float(value) for value in config.data.snr_db),
+        }
+        manifest_output = Path(manifest_path)
+        manifest_output.parent.mkdir(parents=True, exist_ok=True)
+        manifest_output.write_text(json.dumps(manifest, indent=2) + "\n", encoding="utf-8")
     return output
 
 
-def load_split(path: str | Path, split: int) -> tuple[np.ndarray, np.ndarray, np.ndarray]:
+def load_split(
+    path: str | Path,
+    split: int,
+    expected: DataConfig | None = None,
+) -> tuple[np.ndarray, np.ndarray, np.ndarray]:
+    """Load one split after validating the persisted dataset contract."""
     with np.load(path) as dataset:
-        mask = dataset["split"] == split
-        return dataset["noisy"][mask], dataset["clean"][mask], dataset["input_snr_db"][mask]
+        required = {
+            "clean",
+            "noisy",
+            "subject_id",
+            "split",
+            "input_snr_db",
+            "sampling_rate_hz",
+        }
+        missing = required.difference(dataset.files)
+        if missing:
+            raise DataContractError(f"Dataset is missing required arrays: {sorted(missing)}")
+
+        noisy = dataset["noisy"]
+        clean = dataset["clean"]
+        subjects = dataset["subject_id"]
+        splits = dataset["split"]
+        input_snrs = dataset["input_snr_db"]
+        if noisy.shape != clean.shape or noisy.ndim != 3 or noisy.shape[1] != 1:
+            raise DataContractError("clean and noisy arrays must have shape (records, 1, samples)")
+        records = noisy.shape[0]
+        if any(values.shape != (records,) for values in (subjects, splits, input_snrs)):
+            raise DataContractError("Dataset metadata arrays must have one value per record")
+        if not np.isfinite(noisy).all() or not np.isfinite(clean).all():
+            raise DataContractError("Signal arrays must contain only finite values")
+        for subject in np.unique(subjects):
+            if np.unique(splits[subjects == subject]).size != 1:
+                raise DataContractError(f"Subject {subject!r} crosses dataset splits")
+
+        sampling_rate_hz = int(dataset["sampling_rate_hz"].item())
+        if expected is not None:
+            if sampling_rate_hz != expected.sampling_rate_hz:
+                raise DataContractError(
+                    "Dataset sampling rate does not match configuration: "
+                    f"{sampling_rate_hz} != {expected.sampling_rate_hz}"
+                )
+            if noisy.shape[-1] != expected.samples:
+                raise DataContractError(
+                    "Dataset segment length does not match configuration: "
+                    f"{noisy.shape[-1]} != {expected.samples}"
+                )
+
+        mask = splits == split
+        if not np.any(mask):
+            raise DataContractError(f"Dataset split {split} is empty")
+        return noisy[mask], clean[mask], input_snrs[mask]

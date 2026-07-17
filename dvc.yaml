@@ -10,6 +10,8 @@ stages:
       - data
     outs:
       - data/processed/dataset.npz
+      - reports/data_manifest.json:
+          cache: false
 
   train:
     cmd: PYTHONPATH=src python -m ecg_denoising.cli train --config params.yaml
@@ -36,12 +38,15 @@ stages:
       - data/processed/dataset.npz
       - models/model.pt
       - src/ecg_denoising/evaluate.py
+      - src/ecg_denoising/governance.py
       - src/ecg_denoising/metrics.py
       - params.yaml
     outs:
       - reports/predictions.npz
     metrics:
       - reports/metrics.json:
+          cache: false
+      - reports/promotion.json:
           cache: false
     plots:
       - reports/metrics.csv:

@@ -4,4 +4,4 @@ build_dependencies:
   - setuptools
   - wheel
 dependencies:
-  - -e .
+  - -e .[mlops]

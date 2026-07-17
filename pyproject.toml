@@ -8,27 +8,44 @@ version = "0.1.0"
 description = "Reproducible MLOps pipeline for ECG motion-artefact denoising"
 readme = "README.md"
 requires-python = ">=3.10"
-license = { text = "MIT" }
+license = { file = "LICENSE" }
 authors = [{ name = "Ben Russell" }]
 dependencies = [
-  "dvc>=3.59,<4",
-  "mlflow>=2.20,<4",
   "numpy>=1.26,<3",
   "PyYAML>=6.0,<7",
-  "scipy>=1.12,<2",
-  "tensorboard>=2.18,<3",
   "torch>=2.2,<3",
 ]
 
 [project.optional-dependencies]
+mlops = [
+  "dvc>=3.59,<4",
+  "mlflow>=2.20,<4",
+  "scipy>=1.12,<2",
+  "tensorboard>=2.18,<3",
+]
+serve = [
+  "fastapi>=0.115,<1",
+  "prometheus-client>=0.21,<1",
+  "pydantic>=2.10,<3",
+  "uvicorn[standard]>=0.34,<1",
+]
 dev = [
   "build>=1.2,<2",
+  "dvc>=3.59,<4",
+  "fastapi>=0.115,<1",
+  "httpx>=0.28,<1",
+  "mlflow>=2.20,<4",
   "mypy>=1.14,<2",
   "pre-commit>=4,<5",
+  "prometheus-client>=0.21,<1",
+  "pydantic>=2.10,<3",
   "pytest>=8,<9",
   "pytest-cov>=6,<7",
   "ruff>=0.9,<1",
+  "scipy>=1.12,<2",
+  "tensorboard>=2.18,<3",
   "types-PyYAML>=6.0,<7",
+  "uvicorn[standard]>=0.34,<1",
 ]
 
 [project.scripts]
@@ -40,7 +57,7 @@ packages = ["src/ecg_denoising"]
 [tool.pytest.ini_options]
 addopts = "-q --strict-markers --disable-warnings"
 testpaths = ["tests"]
-pythonpath = ["src"]
+pythonpath = ["src", "."]
 
 [tool.ruff]
 line-length = 100

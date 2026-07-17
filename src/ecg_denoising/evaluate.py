@@ -4,17 +4,15 @@ from __future__ import annotations
 
 import csv
 import json
-from dataclasses import fields
 from pathlib import Path
 
 import numpy as np
-import torch
 
-from .config import Config, ModelConfig
+from .config import Config
 from .data import load_split
+from .governance import assess_promotion
+from .inference import DenoisingPredictor
 from .metrics import evaluate_metrics
-from .models import build_model
-from .train import resolve_device
 
 
 def evaluate_model(
@@ -23,18 +21,10 @@ def evaluate_model(
     model_path: str | Path = "models/model.pt",
     report_path: str | Path = "reports/metrics.json",
 ) -> dict[str, float]:
-    noisy, clean, input_snrs = load_split(dataset_path, 2)
-    device = resolve_device(config.training.device)
-    checkpoint = torch.load(model_path, map_location=device, weights_only=True)
-    allowed = {field.name for field in fields(ModelConfig)}
-    model_config = ModelConfig(
-        **{key: value for key, value in checkpoint["model_config"].items() if key in allowed}
-    )
-    model = build_model(model_config).to(device)
-    model.load_state_dict(checkpoint["model_state"])
-    model.eval()
-    with torch.no_grad():
-        predictions = model(torch.from_numpy(noisy).float().to(device)).cpu().numpy()
+    noisy, clean, input_snrs = load_split(dataset_path, 2, config.data)
+    predictor = DenoisingPredictor.from_checkpoint(model_path, config.training.device)
+    predictor.assert_data_config(config.data)
+    predictions = predictor.denoise_batch(noisy, config.data.sampling_rate_hz)
 
     metrics = evaluate_metrics(clean, noisy, predictions)
     report = Path(report_path)
@@ -48,16 +38,22 @@ def evaluate_model(
         input_snr_db=input_snrs,
     )
     csv_path = report.parent / "metrics.csv"
+    by_snr: list[dict[str, float]] = []
     with csv_path.open("w", newline="", encoding="utf-8") as handle:
         writer = csv.DictWriter(handle, fieldnames=["input_snr_db", "snr_improvement_db"])
         writer.writeheader()
         for snr_value in sorted(np.unique(input_snrs)):
             mask = input_snrs == snr_value
             row_metrics = evaluate_metrics(clean[mask], noisy[mask], predictions[mask])
-            writer.writerow(
-                {
-                    "input_snr_db": float(snr_value),
-                    "snr_improvement_db": row_metrics["snr_improvement_db"],
-                }
-            )
+            row = {
+                "input_snr_db": float(snr_value),
+                "snr_improvement_db": row_metrics["snr_improvement_db"],
+            }
+            by_snr.append(row)
+            writer.writerow(row)
+    promotion = assess_promotion(metrics, by_snr, config.promotion)
+    (report.parent / "promotion.json").write_text(
+        json.dumps(promotion, indent=2) + "\n",
+        encoding="utf-8",
+    )
     return metrics

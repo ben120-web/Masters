@@ -1,0 +1,7 @@
+{
+  "rmse": 0.080498106777668,
+  "normalized_correlation": 0.8613174960168706,
+  "input_snr_db": 4.685418845250286,
+  "output_snr_db": 5.655286914758674,
+  "snr_improvement_db": 0.9698680695083883
+}
