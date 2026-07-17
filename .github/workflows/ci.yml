@@ -8,9 +8,14 @@ on:
 permissions:
   contents: read
 
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   test:
     runs-on: ubuntu-latest
+    timeout-minutes: 30
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
@@ -23,5 +28,21 @@ jobs:
       - run: ruff format --check src tests
       - run: mypy src/ecg_denoising
       - run: pytest --cov=ecg_denoising --cov-report=term-missing
+      - run: python -m build
       - name: Smoke-test complete pipeline
         run: python -m ecg_denoising.cli pipeline --config configs/quick.yaml
+
+  container:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: docker/setup-buildx-action@v3
+      - name: Validate production container
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          push: false
+          tags: ecg-motion-denoising:ci
+          cache-from: type=gha
+          cache-to: type=gha,mode=max

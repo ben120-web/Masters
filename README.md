@@ -13,6 +13,12 @@ reproducible experiments, automated validation and deployable model artifacts.
 > This is a research prototype. It is not a medical device and must not be used
 > for diagnosis or clinical decision-making.
 
+CI runs linting, typing, tests, a complete quick-pipeline smoke test, package
+build and container build on every change. Pushing a semantic version tag such
+as `v0.2.0` creates a GitHub release with Python artifacts and publishes the
+same versioned container to GitHub Container Registry. Releases are deliberately
+tag-driven so an ordinary branch push can never publish an artifact.
+
 ## What this demonstrates
 
 - Subject-grouped data splits to reduce identity and synthetic-source leakage.
