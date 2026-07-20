@@ -11,9 +11,9 @@ test:
 	pytest --cov=ecg_denoising --cov-report=term-missing
 
 quality:
-	ruff check src tests
-	ruff format --check src tests
-	mypy src/ecg_denoising
+	ruff check src coursework tests
+	ruff format --check src coursework tests
+	mypy
 
 serve-api:
 	ecg-denoise serve --model-path models/model.pt

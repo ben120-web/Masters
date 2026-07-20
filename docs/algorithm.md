@@ -44,13 +44,22 @@ builds the lifted prediction model
 
 `Y = O x_k + M U`
 
-and solves the unconstrained quadratic tracking objective
+and solves the quadratic tracking objective
 
 `min_U (R - O x_k - M U)^T Q (R - O x_k - M U) + U^T R_u U`.
 
-The constant gain is formed with a linear solve rather than an explicit matrix
-inverse. If `n_u` is the input dimension and `N_u` the control horizon, offline
-factorisation is cubic in `N_u n_u`; each online update is a matrix-vector
-product in the lifted output and control dimensions. Only the first optimal
-input is applied before the problem is updated, giving the receding-horizon
-feedback law. Tests exercise closed-loop directionality and invalid dimensions.
+The unconstrained gain is formed with a linear solve rather than an explicit
+matrix inverse. Optional actuator bounds are solved as a convex box-constrained
+QP with projected gradient updates. If `n_u` is the input dimension and `N_u`
+the control horizon, offline factorisation is cubic in `N_u n_u`; each online
+update is a matrix-vector product plus bounded-solver iterations when enabled.
+Only the first optimal input is applied before the problem is updated, giving
+the receding-horizon feedback law.
+
+The [aircraft-pitch implementation](../coursework/aircraft_mpc/controller.py)
+extends the same lifted formulation to general state inequalities. It enforces
+angle-of-attack, pitch-rate, pitch-angle, angle-difference and asymmetric
+elevator constraints at every predicted step. See the
+[quadcopter](../coursework/quadcopter_control/REPORT.md) and
+[aircraft](../coursework/aircraft_mpc/REPORT.md) reports for the derivations,
+reproducible results and physical limitations.

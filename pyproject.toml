@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "ecg-motion-denoising"
-version = "1.0.0"
+version = "1.1.0"
 description = "Reproducible MLOps pipeline for ECG motion-artefact denoising"
 readme = "README.md"
 requires-python = ">=3.10"
@@ -62,7 +62,15 @@ pythonpath = ["src", "."]
 [tool.ruff]
 line-length = 100
 target-version = "py310"
-exclude = ["coursework", "legacy"]
+exclude = [
+  "legacy",
+  "coursework/control_and_estimation",
+  "coursework/kalman_filter",
+  "coursework/quadcopter_control/controlSystem.py",
+  "coursework/quadcopter_control/controlSystemMPC.py",
+  "coursework/quadcopter_control/controlSystemPID.py",
+  "coursework/quadcopter_control/kalmanFilter.py",
+]
 
 [tool.ruff.lint]
 select = ["E", "F", "I", "B", "UP", "SIM"]
@@ -70,7 +78,12 @@ select = ["E", "F", "I", "B", "UP", "SIM"]
 [tool.mypy]
 python_version = "3.10"
 strict = true
-files = ["src/ecg_denoising"]
+files = [
+  "src/ecg_denoising",
+  "coursework/aircraft_mpc",
+  "coursework/quadcopter_control/model_predictive_controller.py",
+  "coursework/quadcopter_control/demo.py",
+]
 ignore_missing_imports = true
 disallow_any_generics = false
 warn_return_any = false

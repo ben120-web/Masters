@@ -24,9 +24,9 @@ jobs:
           cache: pip
       - run: python -m pip install --upgrade pip
       - run: python -m pip install -e ".[dev]"
-      - run: ruff check src tests
-      - run: ruff format --check src tests
-      - run: mypy src/ecg_denoising
+      - run: ruff check src coursework tests
+      - run: ruff format --check src coursework tests
+      - run: mypy
       - run: pytest --cov=ecg_denoising --cov-report=term-missing
       - run: python -m build
       - name: Smoke-test complete pipeline

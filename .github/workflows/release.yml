@@ -25,8 +25,9 @@ jobs:
           cache: pip
       - run: python -m pip install --upgrade pip
       - run: python -m pip install -e ".[dev]"
-      - run: ruff check src tests
-      - run: mypy src/ecg_denoising
+      - run: ruff check src coursework tests
+      - run: ruff format --check src coursework tests
+      - run: mypy
       - run: pytest -q
       - run: python -m build
       - name: Publish verified-tag release

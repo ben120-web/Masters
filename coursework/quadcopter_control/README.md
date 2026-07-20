@@ -1,13 +1,34 @@
-# Quadcopter control and estimation
+# Quadcopter altitude control and state estimation
 
-This coursework explores altitude control for a discrete-time quadcopter model:
+This module demonstrates the control path developed for a discrete-time
+quadcopter altitude model: estimate altitude and vertical velocity, predict the
+plant response over a finite horizon, optimise the acceleration command, and
+apply the first move as receding-horizon feedback.
 
-1. estimate the state with a Kalman filter;
-2. form lifted prediction matrices for a finite-horizon controller;
-3. solve a quadratic tracking objective and apply only the first control input;
-4. repeat after the next state estimate arrives.
+## Maintained implementation
 
-[`model_predictive_controller.py`](model_predictive_controller.py) contains a
-tested, reusable implementation of the unconstrained linear MPC formulation.
-The other scripts are retained as historical simulations and should be read as
-coursework rather than maintained production modules.
+[`model_predictive_controller.py`](model_predictive_controller.py) provides a
+reusable NumPy implementation with:
+
+- validated MIMO system and weight dimensions;
+- lifted prediction matrices for distinct prediction and control horizons;
+- exact unconstrained control and bounded convex-QP control;
+- actuator bounds enforced over the complete control sequence;
+- predicted-output, objective and convergence diagnostics; and
+- deterministic closed-loop simulation.
+
+Run the documented 40 m altitude step:
+
+```bash
+python -m coursework.quadcopter_control.demo
+```
+
+The reference scenario settles within the 2% band in 7.0 s, limits commanded
+vertical acceleration to ±3.0 m/s², and has 0.567% overshoot. See the
+[technical report](REPORT.md) for the formulation, verification evidence and
+limitations.
+
+The original Kalman-filter and PID comparison scripts remain alongside the
+maintained MPC implementation to show the progression of the coursework. They
+are exploratory scripts; the tested API and reproducible result above are the
+recommended entry points.

@@ -1,34 +1,35 @@
-# ECG Motion-Artefact Denoising
+# MSc Engineering Portfolio
 
 [![CI](https://github.com/ben120-web/Masters/actions/workflows/ci.yml/badge.svg)](https://github.com/ben120-web/Masters/actions/workflows/ci.yml)
 [![Python](https://img.shields.io/badge/python-3.10%2B-blue)](pyproject.toml)
 [![DVC](https://img.shields.io/badge/data-DVC-945DD6)](dvc.yaml)
 [![MLflow](https://img.shields.io/badge/experiments-MLflow-0194E2)](MLproject)
 
-Production-oriented research code for removing electrode-motion artefacts from
-single-lead ECG signals with 1-D deep neural networks. The repository turns the
-original MSc research into an iterative MLOps workflow with versioned data,
-reproducible experiments, automated validation and deployable model artifacts.
+An engineering portfolio spanning biomedical machine learning, model-predictive
+control, state estimation, signal processing and intelligent systems. The MSc
+dissertation is developed as a production-oriented ECG motion-artefact
+denoising system; the taught modules retain their original analysis and expose
+clear, reproducible demonstrations of the methods applied.
 
 > This is a research prototype. It is not a medical device and must not be used
 > for diagnosis or clinical decision-making.
 
 CI runs linting, typing, tests, a complete quick-pipeline smoke test, package
-build and container build on every change. The `v1.0.0` tag creates a GitHub
-release with Python artifacts and publishes the same versioned container to
+build and container build on every change. Version tags create a GitHub
+release with Python artifacts and publish the same versioned container to
 `ghcr.io/ben120-web/ecg-motion-denoising`. Container publication is gated on
 package validation, and ordinary branch pushes cannot publish release artifacts.
 The registry release currently targets `linux/amd64`; ARM users can build the
 same Dockerfile natively from source.
 
-## Version 1.0.0
+## Version 1.1.0
 
-This stable engineering baseline covers the complete path from deterministic
-data preparation and lineage through training, evaluation, model governance,
-typed online inference, telemetry and container delivery. The release gate
-includes 17 tests, Ruff, strict mypy, package construction, a full quick-pipeline
-run, container construction and CodeQL. It versions the software system—not a
-clinically approved model—and requires a compatible checkpoint at runtime.
+This release promotes the taught MSc modules from background material to
+portfolio evidence. It adds constrained and bounded MPC implementations,
+reproducible quadcopter and aircraft-pitch simulations, technical reports and
+expanded regression coverage while preserving the complete denoising system
+released in `v1.0.0`. The version identifies a software portfolio—not a
+clinically approved model or flight-qualified controller.
 
 ## What this demonstrates
 
@@ -40,8 +41,14 @@ clinically approved model—and requires a compatible checkpoint at runtime.
 - Scientific metrics: RMSE, normalised correlation and SNR improvement.
 - Explicit aggregate and worst-case promotion checks with a recorded decision.
 - A contract-validated FastAPI inference service with Prometheus metrics.
-- A tested lifted-matrix MPC implementation with derivation and complexity notes.
+- Bounded quadcopter altitude MPC with solver diagnostics and closed-loop metrics.
+- Constrained aircraft-pitch MPC enforcing the complete predicted flight envelope.
+- Kalman filtering, DSP, Bayesian estimation, forecasting and sensor analysis.
 - Unit tests, linting, type checks, CI and a non-root container runtime.
+
+Explore the [MSc module showcase](coursework/README.md), or go directly to the
+[quadcopter report](coursework/quadcopter_control/REPORT.md) and
+[aircraft-pitch report](coursework/aircraft_mpc/REPORT.md).
 
 ## Quick start
 
@@ -108,7 +115,7 @@ they are not evidence of clinical efficacy.
 
 ```text
 configs/                 named experiment overrides
-coursework/              historical MSc modules, not part of the ML pipeline
+coursework/              MSc module showcase, reports and control demonstrations
 data/                    DVC-managed datasets
 docs/                    data, experiment and deployment guidance
 legacy/                  original MSc research implementation and MATLAB work
@@ -136,9 +143,10 @@ make tensorboard
 
 The original dissertation explored RCNN, convolutional denoising autoencoder
 and recurrent architectures against wavelet and empirical-mode-decomposition
-baselines. Original source and academic material retained for provenance lives
-under `legacy/`; it is intentionally excluded from the maintained package.
-Historical MSc coursework is under `coursework/`.
+baselines. Original dissertation source retained for provenance lives under
+`legacy/`; it is intentionally excluded from the maintained Python package.
+Taught-module work is presented under [`coursework/`](coursework/README.md),
+with maintained, tested implementations for the two MPC studies.
 
 See [`MODEL_CARD.md`](MODEL_CARD.md) for intended use and limitations and
 [`docs/experiments.md`](docs/experiments.md) for the experiment protocol. System
